@@ -57,6 +57,7 @@ function ProductDetailsContent() {
   const [selectedColour, setSelectedColour] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedVariantId, setSelectedVariantId] = useState<string>("");
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | undefined>(undefined);
   const [quantity, setQuantity] = useState(1);
 
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
@@ -80,12 +81,7 @@ function ProductDetailsContent() {
 
   useEffect(() => {
     if (openCheckoutQuery && product) {
-      const user = store.getCurrentUser();
-      if (!user) {
-        setAuthModalOpen(true);
-      } else {
-        setCheckoutModalOpen(true);
-      }
+      setCheckoutModalOpen(true);
     }
   }, [openCheckoutQuery, product]);
 
@@ -130,7 +126,18 @@ function ProductDetailsContent() {
 
   const handleSelectColour = (colour: string) => {
     setSelectedColour(colour);
-    // Select matching variant for this colour (prefer current size)
+
+    if (images && images.length > 0) {
+      const imgMatch = images.find(
+        (i) =>
+          (i.colour && i.colour.toLowerCase() === colour.toLowerCase()) ||
+          (i.alt_text && i.alt_text.toLowerCase().includes(colour.toLowerCase()))
+      );
+      if (imgMatch) {
+        setSelectedImageUrl(imgMatch.image_url);
+      }
+    }
+
     const match = activeVariants.find((v) => v.colour === colour && v.size === selectedSize) ||
       activeVariants.find((v) => v.colour === colour);
     if (match) {
@@ -205,7 +212,9 @@ function ProductDetailsContent() {
           images={images}
           productName={product.name}
           activeColour={selectedColour || selectedVariant?.colour}
+          selectedImageUrl={selectedImageUrl}
           onImageSelect={(img) => {
+            setSelectedImageUrl(img.image_url);
             if (img.colour) {
               handleSelectColour(img.colour);
             }

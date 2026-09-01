@@ -26,16 +26,35 @@ export async function GET() {
         .select("*, product_images(*), product_variants(*)")
         .order("created_at", { ascending: false });
 
+      const finalProds = (reFetch && reFetch.length > 0 ? reFetch : INITIAL_PRODUCTS).map(parseProductImagesColour);
       return NextResponse.json({
-        products: reFetch && reFetch.length > 0 ? reFetch : INITIAL_PRODUCTS,
+        products: finalProds,
         source: reFetch && reFetch.length > 0 ? "supabase" : "mock",
       });
     }
 
-    return NextResponse.json({ products, source: "supabase" });
+    const formattedProducts = products.map(parseProductImagesColour);
+    return NextResponse.json({ products: formattedProducts, source: "supabase" });
   } catch (err: any) {
     return NextResponse.json({ products: INITIAL_PRODUCTS, error: err.message });
   }
+}
+
+function parseProductImagesColour(p: any) {
+  return {
+    ...p,
+    product_images: (p.product_images || []).map((img: any) => {
+      let col = img.colour || "";
+      let alt = img.alt_text || "";
+      if (!col && alt.startsWith("Colour: ")) {
+        const parts = alt.split("|");
+        col = parts[0].replace("Colour: ", "").trim();
+        alt = parts.slice(1).join("|").trim();
+      }
+      return { ...img, colour: col, alt_text: alt || p.name };
+    }),
+    product_variants: p.product_variants || [],
+  };
 }
 
 export async function POST(request: Request) {
@@ -86,16 +105,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: prodErr.message }, { status: 500 });
     }
 
-    // 2. Upsert Images
+    // 2. Upsert Images with encoded colour tag in alt_text
     if (productData.product_images && productData.product_images.length > 0) {
-      const imagesToSave = productData.product_images.map((img: any, idx: number) => ({
-        id: isValidUUID(img.id) ? img.id : generateUUID(),
-        product_id: productId,
-        image_url: img.image_url,
-        alt_text: img.alt_text || productData.name,
-        display_order: img.display_order || idx + 1,
-        is_primary: img.is_primary || idx === 0,
-      }));
+      const imagesToSave = productData.product_images.map((img: any, idx: number) => {
+        const cleanAlt = (img.alt_text || productData.name).replace(/^Colour: [^|]+\|\s*/, "");
+        const colourTag = img.colour ? `Colour: ${img.colour} | ` : "";
+        return {
+          id: isValidUUID(img.id) ? img.id : generateUUID(),
+          product_id: productId,
+          image_url: img.image_url,
+          alt_text: `${colourTag}${cleanAlt}`,
+          display_order: img.display_order || idx + 1,
+          is_primary: img.is_primary || idx === 0,
+        };
+      });
 
       const { error: imgErr } = await supabase.from("product_images").upsert(imagesToSave);
       if (imgErr) console.warn("[SUPABASE_API] Warning upserting images:", imgErr);
