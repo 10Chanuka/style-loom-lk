@@ -18,6 +18,8 @@ import {
   Quote,
 } from "lucide-react";
 
+import { HeroSlider } from "@/components/home/HeroSlider";
+
 export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -39,95 +41,8 @@ export default function HomePage() {
   return (
     <div className="space-y-16 lg:space-y-24 pb-16">
       
-      {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-slate-950 text-white py-16 lg:py-24 border-b border-slate-800">
-        <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#e11d48_1px,transparent_1px)] [background-size:16px_16px]" />
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-brand/20 border border-brand/40 text-rose-300 px-4 py-1.5 rounded-full text-xs font-semibold">
-                <Sparkles className="h-4 w-4 text-brand" /> Style Loom — “Style That Speaks, Quality That Lasts.”
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight text-white">
-                Island Elegance in <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-300 to-amber-200">
-                  Every Stitch
-                </span>
-              </h1>
-
-              <p className="text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed mx-auto lg:mx-0">
-                Discover high-quality printed T-shirts (unisex), handcrafted women Kurtas, and tailored saree & modern Blouses in Sri Lanka.
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-                <Button asChild size="lg" className="w-full sm:w-auto bg-brand hover:bg-brand-700 text-white font-bold shadow-lg shadow-brand/30">
-                  <Link href="/products">
-                    Explore Catalogue <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-slate-700 text-white hover:bg-slate-800">
-                  <Link href="/customize">
-                    <Scissors className="mr-2 h-4 w-4 text-brand" /> Custom Design Request
-                  </Link>
-                </Button>
-              </div>
-
-              {/* Direct WhatsApp Badge */}
-              <div className="pt-4 flex items-center justify-center lg:justify-start gap-3 text-xs text-slate-400">
-                <span className="flex items-center gap-1.5 font-semibold text-emerald-400">
-                  <MessageCircle className="h-4 w-4" /> Direct WhatsApp Checkout:
-                </span>
-                <a
-                  href={`https://wa.me/${settings.whatsapp_number}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-white font-medium"
-                >
-                  +{settings.whatsapp_number}
-                </a>
-              </div>
-            </div>
-
-            {/* Hero Visual Collage */}
-            <div className="grid grid-cols-2 gap-4 relative">
-              <div className="space-y-4">
-                <div className="overflow-hidden rounded-2xl shadow-2xl border border-slate-800 h-64">
-                  <img
-                    src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80"
-                    alt="Printed T-Shirt Unisex"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="overflow-hidden rounded-2xl shadow-2xl border border-slate-800 h-44 bg-rose-950/40 p-6 flex flex-col justify-between">
-                  <span className="text-xs font-bold text-rose-300 uppercase tracking-widest">Unisex Graphics</span>
-                  <p className="text-sm font-semibold text-white">Soft Combed Cotton T-Shirts</p>
-                  <Link href="/category/t-shirts" className="text-xs font-bold text-brand hover:underline flex items-center gap-1">
-                    Shop T-Shirts <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-              </div>
-              <div className="space-y-4 pt-8">
-                <div className="overflow-hidden rounded-2xl shadow-2xl border border-slate-800 h-44 bg-slate-900 p-6 flex flex-col justify-between">
-                  <span className="text-xs font-bold text-amber-300 uppercase tracking-widest">Women Kurtas</span>
-                  <p className="text-sm font-semibold text-white">Handcrafted Zari & Embroidery</p>
-                  <Link href="/category/kurtas" className="text-xs font-bold text-brand hover:underline flex items-center gap-1">
-                    Shop Kurtas <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-                <div className="overflow-hidden rounded-2xl shadow-2xl border border-slate-800 h-64">
-                  <img
-                    src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop&q=80"
-                    alt="Women Kurta Collection"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Interactive 4-Banner Image Slider */}
+      <HeroSlider />
 
       {/* Main Categories Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
