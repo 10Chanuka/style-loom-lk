@@ -222,12 +222,14 @@ function ProductDetailsContent() {
                 variant={
                   isOutOfStock
                     ? "destructive"
-                    : product.stock_status === "low_stock"
+                    : (selectedVariant?.stock_quantity ?? 10) <= 5
                     ? "warning"
                     : "success"
                 }
               >
-                {isOutOfStock ? "Out of Stock" : `In Stock (${selectedVariant?.stock_quantity || 10} available)`}
+                {isOutOfStock
+                  ? `Out of Stock (${selectedVariant?.colour || ''} ${selectedVariant?.size || ''})`
+                  : `In Stock (${selectedVariant?.stock_quantity ?? 0} available in ${selectedVariant?.colour} / ${selectedVariant?.size})`}
               </Badge>
             </div>
 
