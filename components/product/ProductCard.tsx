@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Product } from "@/lib/supabase/mock-data";
 import { formatLKR } from "@/lib/utils";
 import { store } from "@/lib/supabase/store";
@@ -15,10 +14,25 @@ import { Badge } from "@/components/ui/badge";
 export function ProductCard({ product }: { product: Product }) {
   const { showToast } = useToast();
   const [authOpen, setAuthOpen] = useState(false);
+  const [selectedColour, setSelectedColour] = useState<string | null>(null);
+
   const primaryImage =
     product.product_images?.find((img) => img.is_primary)?.image_url ||
     product.product_images?.[0]?.image_url ||
     "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80";
+
+  // Dynamic card thumbnail based on hovered/selected colour chip
+  const cardImage = useMemo(() => {
+    if (selectedColour && product.product_images) {
+      const match = product.product_images.find(
+        (img) =>
+          (img.colour && img.colour.toLowerCase() === selectedColour.toLowerCase()) ||
+          (img.alt_text && img.alt_text.toLowerCase().includes(selectedColour.toLowerCase()))
+      );
+      if (match) return match.image_url;
+    }
+    return primaryImage;
+  }, [selectedColour, product.product_images, primaryImage]);
 
   const activeVariants = product.product_variants?.filter((v) => v.is_active) || [];
   const defaultVariant = activeVariants[0];
@@ -50,6 +64,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   const isOnSale = product.sale_price !== null && product.sale_price !== undefined && product.sale_price < product.base_price;
   const currentPrice = isOnSale ? product.sale_price! : product.base_price;
+  const availableColours = Array.from(new Set(activeVariants.map((v) => v.colour)));
 
   return (
     <>
@@ -88,12 +103,12 @@ export function ProductCard({ product }: { product: Product }) {
           </Badge>
         </div>
 
-        {/* Product Image */}
+        {/* Dynamic Product Image */}
         <Link href={`/products/${product.slug}`} className="relative aspect-[3/4] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
           <img
-            src={primaryImage}
+            src={cardImage}
             alt={product.name}
-            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover object-center transition-all duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
             <span className="bg-white text-slate-900 px-3 py-1.5 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
@@ -131,18 +146,31 @@ export function ProductCard({ product }: { product: Product }) {
             )}
           </div>
 
-          {/* Colours Available */}
-          {activeVariants.length > 0 && (
-            <div className="flex items-center gap-1 mb-4">
-              <span className="text-[11px] text-slate-400 mr-1">Colours:</span>
-              {Array.from(new Set(activeVariants.map((v) => v.colour))).slice(0, 3).map((col, idx) => (
-                <span
-                  key={idx}
-                  className="inline-block px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-700 font-medium dark:bg-slate-800 dark:text-slate-300"
-                >
-                  {col}
-                </span>
-              ))}
+          {/* Interactive Colour Swatches */}
+          {availableColours.length > 0 && (
+            <div className="flex items-center gap-1.5 mb-4 flex-wrap">
+              <span className="text-[11px] text-slate-400 font-medium">Colours:</span>
+              {availableColours.map((col, idx) => {
+                const isSelected = selectedColour === col;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSelectedColour(col);
+                    }}
+                    onMouseEnter={() => setSelectedColour(col)}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all border ${
+                      isSelected
+                        ? "bg-brand text-white border-brand shadow-sm scale-105"
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                    }`}
+                  >
+                    {col}
+                  </button>
+                );
+              })}
             </div>
           )}
 

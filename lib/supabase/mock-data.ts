@@ -40,6 +40,7 @@ export interface ProductImage {
   alt_text: string;
   display_order: number;
   is_primary: boolean;
+  colour?: string;
   created_at?: string;
 }
 
@@ -235,8 +236,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     product_images: [
-      { id: "img-1", product_id: "a1000000-0000-0000-0000-000000000001", image_url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80", alt_text: "Minimalist Tropical Palm Graphic Tee Front View", display_order: 1, is_primary: true, created_at: new Date().toISOString() },
-      { id: "img-2", product_id: "a1000000-0000-0000-0000-000000000001", image_url: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80", alt_text: "Minimalist Tropical Palm Graphic Tee Model Angle", display_order: 2, is_primary: false, created_at: new Date().toISOString() },
+      { id: "img-1", product_id: "a1000000-0000-0000-0000-000000000001", image_url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80", alt_text: "Minimalist Tropical Palm Graphic Tee Black", display_order: 1, is_primary: true, colour: "Black", created_at: new Date().toISOString() },
+      { id: "img-2", product_id: "a1000000-0000-0000-0000-000000000001", image_url: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80", alt_text: "Minimalist Tropical Palm Graphic Tee White", display_order: 2, is_primary: false, colour: "White", created_at: new Date().toISOString() },
     ],
     product_variants: [
       { id: "v1-1", product_id: "a1000000-0000-0000-0000-000000000001", sku: "TS-PALM-BLK-S", size: "S", colour: "Black", stock_quantity: 15, price_adjustment: 0, is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
@@ -263,7 +264,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     product_images: [
-      { id: "img-3", product_id: "a1000000-0000-0000-0000-000000000002", image_url: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&auto=format&fit=crop&q=80", alt_text: "Colombo Heritage Typographic T-Shirt Black", display_order: 1, is_primary: true, created_at: new Date().toISOString() },
+      { id: "img-3", product_id: "a1000000-0000-0000-0000-000000000002", image_url: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&auto=format&fit=crop&q=80", alt_text: "Colombo Heritage Typographic T-Shirt Navy Blue", display_order: 1, is_primary: true, colour: "Navy Blue", created_at: new Date().toISOString() },
+      { id: "img-3b", product_id: "a1000000-0000-0000-0000-000000000002", image_url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80", alt_text: "Colombo Heritage Typographic T-Shirt Black", display_order: 2, is_primary: false, colour: "Black", created_at: new Date().toISOString() },
     ],
     product_variants: [
       { id: "v2-1", product_id: "a1000000-0000-0000-0000-000000000002", sku: "TS-COL-NAV-M", size: "M", colour: "Navy Blue", stock_quantity: 18, price_adjustment: 0, is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
