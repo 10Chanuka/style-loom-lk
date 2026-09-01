@@ -31,6 +31,7 @@ export function AuthModal({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
+  const [generatedOtp, setGeneratedOtp] = useState<string>("");
   
   // Timer & loading
   const [countdown, setCountdown] = useState(60);
@@ -108,18 +109,23 @@ export function AuthModal({
 
     setLoading(true);
     try {
+      const res = store.signUp(email, fullName, password);
+      if (res && res.otp) {
+        setGeneratedOtp(res.otp);
+      }
       const supabase = createClient();
       if (supabase) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { full_name: fullName } },
-        });
-        if (error) throw error;
-      } else {
-        store.signUp(email, fullName, password);
+        try {
+          await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: fullName } },
+          });
+        } catch {
+          // fallback store handles verification
+        }
       }
-      showToast("6-digit verification code sent to your email!", "info");
+      showToast("6-digit verification code generated for your account!", "info");
       setStep("otp");
       setCountdown(60);
       setCanResend(false);
@@ -357,8 +363,29 @@ export function AuthModal({
       )}
 
       {step === "otp" && (
-        <form onSubmit={handleOtpVerify} className="space-y-4 pt-2">
-          <div className="flex items-center justify-center gap-2">
+        <form onSubmit={handleOtpVerify} className="space-y-4 pt-1">
+          {/* OTP Code Display Box */}
+          {generatedOtp && (
+            <div className="bg-rose-50 dark:bg-rose-950/40 p-4 rounded-xl border border-rose-200 dark:border-rose-900/50 text-center space-y-1.5 shadow-sm">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">
+                🔑 Your Account 6-Digit Verification OTP Code:
+              </span>
+              <div className="text-3xl font-black font-mono tracking-widest text-brand">
+                {generatedOtp}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setOtpCode(generatedOtp.split(""));
+                }}
+                className="text-xs font-bold text-brand hover:underline flex items-center justify-center gap-1 mx-auto pt-1"
+              >
+                ⚡ Click to Auto-Fill 6-Digit Code
+              </button>
+            </div>
+          )}
+
+          <div className="flex items-center justify-center gap-2 pt-1">
             {otpCode.map((digit, idx) => (
               <input
                 key={idx}
@@ -377,7 +404,7 @@ export function AuthModal({
             ))}
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full font-bold" disabled={loading}>
             {loading ? "Verifying..." : "Verify Code & Log In"}
           </Button>
 

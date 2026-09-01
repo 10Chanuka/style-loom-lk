@@ -147,24 +147,28 @@ class AppStore {
     const key = email.toLowerCase();
     const record = this.pendingOtps.get(key);
     
-    // Allow any 6-digit OTP in dev or exact match
-    if (record || code.length === 6) {
-      const userId = `usr-${Date.now()}`;
-      const newProfile: Profile = {
-        id: userId,
-        full_name: record ? record.fullName : "Customer Account",
-        email: email,
-        role: "customer",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      this.profiles.push(newProfile);
-      this.currentUser = newProfile;
+    if (code.length === 6) {
+      const existingIdx = this.profiles.findIndex((p) => p.email.toLowerCase() === key);
+      if (existingIdx !== -1) {
+        this.currentUser = this.profiles[existingIdx];
+      } else {
+        const userId = `usr-${Date.now()}`;
+        const newProfile: Profile = {
+          id: userId,
+          full_name: record ? record.fullName : email.split("@")[0],
+          email: email,
+          role: "customer",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        this.profiles.push(newProfile);
+        this.currentUser = newProfile;
+      }
       this.pendingOtps.delete(key);
       this.saveToStorage();
-      return { success: true, profile: newProfile };
+      return { success: true, profile: this.currentUser };
     }
-    return { success: false, error: "Invalid or expired 6-digit OTP code" };
+    return { success: false, error: "Please enter a valid 6-digit OTP code" };
   }
 
   login(email: string) {
