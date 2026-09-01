@@ -86,8 +86,31 @@ class AppStore {
   private loadFromStorage() {
     if (typeof window === "undefined") return;
     try {
+      const v = localStorage.getItem("elegance_store_v3");
+      if (!v) {
+        localStorage.setItem("elegance_store_v3", "3.0");
+        localStorage.setItem("elegance_products", JSON.stringify(INITIAL_PRODUCTS));
+        localStorage.setItem("elegance_categories", JSON.stringify(INITIAL_CATEGORIES));
+        this.products = [...INITIAL_PRODUCTS];
+        this.categories = [...INITIAL_CATEGORIES];
+        return;
+      }
+
       const p = localStorage.getItem("elegance_products");
-      if (p) this.products = JSON.parse(p);
+      if (p) {
+        const parsedProducts: Product[] = JSON.parse(p);
+        // Enrich products that might be missing new fields or variants
+        this.products = parsedProducts.map((prod) => {
+          const initMatch = INITIAL_PRODUCTS.find((ip) => ip.id === prod.id);
+          if (!prod.product_variants || prod.product_variants.length === 0) {
+            prod.product_variants = initMatch?.product_variants || prod.product_variants;
+          }
+          if (!prod.product_images || prod.product_images.length === 0) {
+            prod.product_images = initMatch?.product_images || prod.product_images;
+          }
+          return prod;
+        });
+      }
       const c = localStorage.getItem("elegance_categories");
       if (c) this.categories = JSON.parse(c);
       const s = localStorage.getItem("elegance_settings");
