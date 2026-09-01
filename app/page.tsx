@@ -25,10 +25,12 @@ export default function HomePage() {
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SITE_SETTINGS);
 
   useEffect(() => {
-    setCategories(store.getCategories());
-    setProducts(store.getProducts());
-    setReviews(store.getAllReviews().filter((r) => r.status === "approved"));
-    setSettings(store.getSiteSettings());
+    store.syncWithSupabase().then(() => {
+      setCategories(store.getCategories());
+      setProducts(store.getProducts());
+      setReviews(store.getAllReviews().filter((r) => r.status === "approved"));
+      setSettings(store.getSiteSettings());
+    });
   }, []);
 
   const featuredProducts = products.filter((p) => p.featured && p.is_active);

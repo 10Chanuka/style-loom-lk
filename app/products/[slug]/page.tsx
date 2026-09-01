@@ -64,15 +64,17 @@ function ProductDetailsContent() {
 
   useEffect(() => {
     if (slug) {
-      const p = store.getProductBySlug(slug);
-      setProduct(p);
-      if (p && p.product_variants && p.product_variants.length > 0) {
-        const firstVar = p.product_variants.find((v) => v.is_active) || p.product_variants[0];
-        setSelectedVariantId(firstVar.id);
-        setSelectedColour(firstVar.colour);
-        setSelectedSize(firstVar.size);
-      }
-      setLoading(false);
+      store.syncWithSupabase().then(() => {
+        const p = store.getProductBySlug(slug);
+        setProduct(p);
+        if (p && p.product_variants && p.product_variants.length > 0) {
+          const firstVar = p.product_variants.find((v) => v.is_active) || p.product_variants[0];
+          setSelectedVariantId(firstVar.id);
+          setSelectedColour(firstVar.colour);
+          setSelectedSize(firstVar.size);
+        }
+        setLoading(false);
+      });
     }
   }, [slug]);
 

@@ -239,30 +239,32 @@ class AppStore {
   async syncWithSupabase() {
     if (typeof window === "undefined") return;
     try {
-      const client = createClient();
-      if (!client) return;
-
-      const { data: catData } = await client
-        .from("categories")
-        .select("*")
-        .order("display_order", { ascending: true });
-
-      if (catData && catData.length > 0) {
-        this.categories = catData;
+      // 1. Fetch from Server API (bypasses RLS & syncs DB to all devices)
+      const res = await fetch("/api/products");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.products && Array.isArray(json.products) && json.products.length > 0) {
+          this.products = json.products.map((p: any) => ({
+            ...p,
+            product_images: p.product_images || [],
+            product_variants: p.product_variants || [],
+          }));
+          this.saveToStorage();
+        }
       }
 
-      const { data: prodData } = await client
-        .from("products")
-        .select("*, product_images(*), product_variants(*)")
-        .order("created_at", { ascending: false });
+      // 2. Direct client fallback check
+      const client = createClient();
+      if (client) {
+        const { data: catData } = await client
+          .from("categories")
+          .select("*")
+          .order("display_order", { ascending: true });
 
-      if (prodData && prodData.length > 0) {
-        this.products = prodData.map((p: any) => ({
-          ...p,
-          product_images: p.product_images || [],
-          product_variants: p.product_variants || [],
-        }));
-        this.saveToStorage();
+        if (catData && catData.length > 0) {
+          this.categories = catData;
+          this.saveToStorage();
+        }
       }
     } catch (err) {
       console.warn("[SUPABASE] Sync warning:", err);
@@ -305,59 +307,15 @@ class AppStore {
     }
     this.saveToStorage();
 
-    // Async Cloud Database Sync (Supabase PostgreSQL)
+    // Async Cloud Database Sync via Server API (persists across all devices)
     try {
-      const client = createClient();
-      if (client && targetProduct) {
-        const { product_images, product_variants, category, ...dbPayload } = targetProduct;
-
-        client.from("products").upsert({
-          id: dbPayload.id,
-          category_id: dbPayload.category_id,
-          name: dbPayload.name,
-          slug: dbPayload.slug,
-          product_code: dbPayload.product_code,
-          short_description: dbPayload.short_description,
-          full_description: dbPayload.full_description,
-          base_price: dbPayload.base_price,
-          sale_price: dbPayload.sale_price,
-          featured: dbPayload.featured,
-          is_active: dbPayload.is_active,
-          stock_status: dbPayload.stock_status,
-          care_instructions: dbPayload.care_instructions,
-          material: dbPayload.material,
-          updated_at: new Date().toISOString(),
-        }).then(() => {
-          if (product_images && product_images.length > 0) {
-            const imgsToSave = product_images.map((img) => ({
-              id: img.id || `img-${Date.now()}-${Math.random()}`,
-              product_id: dbPayload.id,
-              image_url: img.image_url,
-              alt_text: img.alt_text || dbPayload.name,
-              display_order: img.display_order || 1,
-              is_primary: img.is_primary || false,
-              colour: img.colour || "",
-            }));
-            client.from("product_images").upsert(imgsToSave);
-          }
-
-          if (product_variants && product_variants.length > 0) {
-            const varsToSave = product_variants.map((v) => ({
-              id: v.id || `v-${Date.now()}-${Math.random()}`,
-              product_id: dbPayload.id,
-              sku: v.sku,
-              size: v.size,
-              colour: v.colour,
-              stock_quantity: v.stock_quantity,
-              price_adjustment: v.price_adjustment || 0,
-              is_active: v.is_active ?? true,
-            }));
-            client.from("product_variants").upsert(varsToSave);
-          }
-        });
-      }
+      fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(targetProduct),
+      }).catch((err) => console.warn("[API_SAVE] Sync error:", err));
     } catch (err) {
-      console.warn("Supabase async save error:", err);
+      console.warn("[STORE_SAVE] Error triggering product API save:", err);
     }
   }
 
@@ -366,12 +324,11 @@ class AppStore {
     this.saveToStorage();
 
     try {
-      const client = createClient();
-      if (client) {
-        client.from("products").delete().eq("id", id);
-      }
+      fetch(`/api/products?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      }).catch((err) => console.warn("[API_DELETE] Sync error:", err));
     } catch (err) {
-      console.warn("Supabase async delete error:", err);
+      console.warn("[STORE_DELETE] Error triggering product API delete:", err);
     }
   }
 

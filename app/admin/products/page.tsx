@@ -49,8 +49,10 @@ export default function AdminProductsPage() {
   const [genDefaultStock, setGenDefaultStock] = useState(15);
 
   const loadData = () => {
-    setProducts(store.getProducts());
-    setCategories(store.getCategories());
+    store.syncWithSupabase().then(() => {
+      setProducts(store.getProducts());
+      setCategories(store.getCategories());
+    });
   };
 
   useEffect(() => {

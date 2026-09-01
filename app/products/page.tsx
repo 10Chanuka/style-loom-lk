@@ -30,8 +30,10 @@ function ProductsContent() {
   });
 
   useEffect(() => {
-    setCategories(store.getCategories());
-    setProducts(store.getProducts());
+    store.syncWithSupabase().then(() => {
+      setCategories(store.getCategories());
+      setProducts(store.getProducts());
+    });
   }, []);
 
   const handleFilterChange = (newFilters: Partial<FilterState>) => {
