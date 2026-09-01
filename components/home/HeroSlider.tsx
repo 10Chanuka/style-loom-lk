@@ -86,73 +86,112 @@ export function HeroSlider() {
 
   return (
     <div
-      className="relative w-full overflow-hidden bg-slate-950 shadow-2xl group"
+      className="relative w-full overflow-hidden bg-slate-950 py-8 sm:py-12 shadow-2xl group border-b border-slate-800"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Slides Carousel Container */}
-      <div
-        className="flex transition-transform duration-700 ease-out h-[360px] sm:h-[480px] md:h-[540px] lg:h-[600px]"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-      >
-        {SLIDES.map((slide) => (
-          <div key={slide.id} className="relative w-full h-full shrink-0 overflow-hidden">
-            {/* Background Banner Image */}
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover object-center"
-            />
+      {/* Subtle Background Ambience */}
+      <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#e11d48_1px,transparent_1px)] [background-size:24px_24px]" />
 
-            {/* Subtle Gradient Overlay for Text Readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/30 to-transparent flex items-center">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                <div className="max-w-xl space-y-3 sm:space-y-4">
+      {/* 3D Center Focus Stage Container */}
+      <div className="relative max-w-7xl mx-auto px-4 h-[380px] sm:h-[480px] md:h-[540px] flex items-center justify-center">
+        {SLIDES.map((slide, index) => {
+          // Calculate relative index position (-1, 0, 1, etc.)
+          let offset = index - currentIndex;
+          if (offset < -1) offset += SLIDES.length;
+          if (offset > 1) offset -= SLIDES.length;
+
+          const isCenter = offset === 0;
+          const isLeft = offset === -1;
+          const isRight = offset === 1;
+
+          // Determine styling based on position
+          let positionClasses = "opacity-0 scale-50 z-0 pointer-events-none";
+          if (isCenter) {
+            positionClasses = "opacity-100 scale-100 z-30 translate-x-0 shadow-2xl ring-1 ring-white/20";
+          } else if (isLeft) {
+            positionClasses = "opacity-40 scale-80 sm:scale-85 -translate-x-[65%] sm:-translate-x-[55%] z-10 cursor-pointer hover:opacity-70 blur-[1px] hover:blur-none";
+          } else if (isRight) {
+            positionClasses = "opacity-40 scale-80 sm:scale-85 translate-x-[65%] sm:translate-x-[55%] z-10 cursor-pointer hover:opacity-70 blur-[1px] hover:blur-none";
+          }
+
+          return (
+            <div
+              key={slide.id}
+              onClick={() => {
+                if (isLeft) prevSlide();
+                if (isRight) nextSlide();
+              }}
+              className={`absolute top-0 w-[88%] sm:w-[75%] md:w-[68%] lg:w-[62%] h-full rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-700 ease-out bg-slate-900 flex flex-col justify-end ${positionClasses}`}
+            >
+              {/* Full Uncropped Image with Blurred Backdrop */}
+              <div className="relative w-full h-full overflow-hidden bg-slate-950 flex items-center justify-center">
+                {/* Blurred Background Fill */}
+                <img
+                  src={slide.image}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover opacity-30 blur-xl scale-110"
+                />
+
+                {/* Main Full Uncropped Banner Image */}
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className="relative max-w-full max-h-full object-contain mx-auto transition-transform duration-500 hover:scale-[1.02]"
+                />
+
+                {/* Subtle Gradient Shadow Overlay at Bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+              </div>
+
+              {/* Slide Content Overlay (Visible on Center Slide) */}
+              {isCenter && (
+                <div className="absolute bottom-0 inset-x-0 p-4 sm:p-6 md:p-8 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent space-y-2 sm:space-y-3 text-center sm:text-left z-20">
                   
                   {/* Tagline Badge */}
-                  <div className="inline-flex items-center gap-1.5 bg-brand/90 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
+                  <div className="inline-flex items-center gap-1.5 bg-brand text-white text-[9px] sm:text-xs font-black uppercase tracking-widest px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-lg">
                     <Sparkles className="h-3 w-3 text-amber-300" />
                     <span>{slide.tagline}</span>
                   </div>
 
                   {/* Title */}
-                  <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-md">
+                  <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
                     {slide.title}
                   </h2>
 
                   {/* Subtitle */}
-                  <p className="text-xs sm:text-base text-slate-200 line-clamp-2 sm:line-clamp-3 leading-relaxed drop-shadow">
+                  <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-2xl leading-relaxed">
                     {slide.subtitle}
                   </p>
 
                   {/* Action Buttons */}
-                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 pt-2">
-                    <Button asChild size="sm" className="sm:size-lg bg-brand hover:bg-brand-700 text-white font-extrabold shadow-xl text-xs sm:text-sm">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 pt-1">
+                    <Button asChild size="sm" className="bg-brand hover:bg-brand-700 text-white font-extrabold shadow-lg text-xs">
                       <Link href={slide.primaryButtonLink}>
-                        {slide.primaryButtonText} <ArrowRight className="ml-1.5 h-4 w-4" />
+                        {slide.primaryButtonText} <ArrowRight className="ml-1 h-3.5 w-3.5" />
                       </Link>
                     </Button>
 
                     {slide.secondaryButtonText && (
-                      <Button asChild variant="outline" size="sm" className="sm:size-lg border-white/80 text-white hover:bg-white/20 backdrop-blur-sm font-bold text-xs sm:text-sm">
+                      <Button asChild variant="outline" size="sm" className="border-white/60 text-white hover:bg-white/20 backdrop-blur-sm font-bold text-xs">
                         <Link href={slide.secondaryButtonLink || "/products"}>
-                          <Scissors className="mr-1.5 h-4 w-4 text-rose-300" />
+                          <Scissors className="mr-1 h-3.5 w-3.5 text-rose-300" />
                           {slide.secondaryButtonText}
                         </Link>
                       </Button>
                     )}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Prev / Next Navigation Controls */}
+      {/* Navigation Arrow Controls */}
       <button
         onClick={prevSlide}
-        className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 bg-slate-950/60 hover:bg-brand text-white p-2 sm:p-3 rounded-full backdrop-blur-md opacity-80 hover:opacity-100 transition-all shadow-lg border border-white/10 z-20"
+        className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 bg-slate-900/80 hover:bg-brand text-white p-2.5 sm:p-3.5 rounded-full backdrop-blur-md transition-all shadow-2xl border border-white/20 z-40"
         aria-label="Previous Slide"
       >
         <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -160,14 +199,14 @@ export function HeroSlider() {
 
       <button
         onClick={nextSlide}
-        className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 bg-slate-950/60 hover:bg-brand text-white p-2 sm:p-3 rounded-full backdrop-blur-md opacity-80 hover:opacity-100 transition-all shadow-lg border border-white/10 z-20"
+        className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 bg-slate-900/80 hover:bg-brand text-white p-2.5 sm:p-3.5 rounded-full backdrop-blur-md transition-all shadow-2xl border border-white/20 z-40"
         aria-label="Next Slide"
       >
         <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
       </button>
 
-      {/* Slide Indicators / Dots */}
-      <div className="absolute bottom-4 inset-x-0 flex items-center justify-center gap-2 z-20">
+      {/* Pagination Dots */}
+      <div className="flex items-center justify-center gap-2 pt-4 relative z-40">
         {SLIDES.map((slide, idx) => (
           <button
             key={slide.id}
@@ -175,7 +214,7 @@ export function HeroSlider() {
             className={`h-2 rounded-full transition-all duration-300 ${
               currentIndex === idx
                 ? "w-8 bg-brand ring-2 ring-brand/40"
-                : "w-2 bg-white/50 hover:bg-white"
+                : "w-2 bg-slate-700 hover:bg-slate-400"
             }`}
             aria-label={`Go to slide ${idx + 1}`}
           />
