@@ -146,36 +146,36 @@ export function HeroSlider() {
 
               {/* Slide Content Overlay (Visible on Center Slide) */}
               {isCenter && (
-                <div className="absolute bottom-0 inset-x-0 p-4 sm:p-6 md:p-8 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent space-y-2 sm:space-y-3 text-center sm:text-left z-20">
+                <div className="absolute bottom-3 sm:bottom-4 inset-x-3 sm:inset-x-6 p-4 sm:p-6 bg-slate-950/85 backdrop-blur-md border border-white/10 rounded-2xl sm:rounded-3xl space-y-2 sm:space-y-3 text-center sm:text-left z-20 shadow-2xl">
                   
                   {/* Tagline Badge */}
-                  <div className="inline-flex items-center gap-1.5 bg-brand text-white text-[9px] sm:text-xs font-black uppercase tracking-widest px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-lg">
-                    <Sparkles className="h-3 w-3 text-amber-300" />
+                  <div className="inline-flex items-center gap-1.5 bg-amber-400 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
+                    <Sparkles className="h-3 w-3 text-slate-950" />
                     <span>{slide.tagline}</span>
                   </div>
 
                   {/* Title */}
-                  <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
+                  <h2 className="text-base sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight drop-shadow-md">
                     {slide.title}
                   </h2>
 
                   {/* Subtitle */}
-                  <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-2xl leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-200 line-clamp-2 max-w-2xl leading-relaxed">
                     {slide.subtitle}
                   </p>
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 pt-1">
-                    <Button asChild size="sm" className="bg-brand hover:bg-brand-700 text-white font-extrabold shadow-lg text-xs">
+                  {/* Action Buttons with High-Contrast Colors */}
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-3 pt-1">
+                    <Button asChild size="sm" className="bg-rose-600 hover:bg-rose-700 text-white font-extrabold shadow-xl text-xs px-4 py-2 rounded-xl">
                       <Link href={slide.primaryButtonLink}>
-                        {slide.primaryButtonText} <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                        {slide.primaryButtonText} <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                       </Link>
                     </Button>
 
                     {slide.secondaryButtonText && (
-                      <Button asChild variant="outline" size="sm" className="border-white/60 text-white hover:bg-white/20 backdrop-blur-sm font-bold text-xs">
+                      <Button asChild variant="outline" size="sm" className="bg-white hover:bg-slate-100 text-slate-950 font-extrabold shadow-xl border-white text-xs px-4 py-2 rounded-xl">
                         <Link href={slide.secondaryButtonLink || "/products"}>
-                          <Scissors className="mr-1 h-3.5 w-3.5 text-rose-300" />
+                          <Scissors className="mr-1.5 h-3.5 w-3.5 text-rose-600" />
                           {slide.secondaryButtonText}
                         </Link>
                       </Button>
