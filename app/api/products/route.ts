@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { INITIAL_PRODUCTS, INITIAL_CATEGORIES } from "@/lib/supabase/mock-data";
+import { generateUUID } from "@/lib/utils";
+
+const isValidUUID = (id?: string) => Boolean(id && id.length === 36 && id.includes("-"));
 
 export async function GET() {
   try {
@@ -48,14 +51,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, product: productData, note: "Local store fallback" });
     }
 
-    const productId = productData.id || `p-${Date.now()}`;
+    const productId = isValidUUID(productData.id) ? productData.id : generateUUID();
     const slug = productData.slug || productData.name.toLowerCase().replace(/\s+/g, "-");
     const code = productData.product_code || `PRD-${Date.now().toString().slice(-4)}`;
+
+    // Ensure category_id is a valid UUID
+    let categoryId = isValidUUID(productData.category_id) ? productData.category_id : null;
+    if (!categoryId) {
+      const { data: catList } = await supabase.from("categories").select("id").limit(1);
+      categoryId = catList?.[0]?.id || "11111111-0000-0000-0000-000000000001";
+    }
 
     // 1. Upsert Product Row
     const { error: prodErr } = await supabase.from("products").upsert({
       id: productId,
-      category_id: productData.category_id,
+      category_id: categoryId,
       name: productData.name,
       slug: slug,
       product_code: code,
@@ -79,7 +89,7 @@ export async function POST(request: Request) {
     // 2. Upsert Images
     if (productData.product_images && productData.product_images.length > 0) {
       const imagesToSave = productData.product_images.map((img: any, idx: number) => ({
-        id: img.id && img.id.length === 36 ? img.id : undefined,
+        id: isValidUUID(img.id) ? img.id : generateUUID(),
         product_id: productId,
         image_url: img.image_url,
         alt_text: img.alt_text || productData.name,
@@ -87,15 +97,16 @@ export async function POST(request: Request) {
         is_primary: img.is_primary || idx === 0,
       }));
 
-      await supabase.from("product_images").upsert(imagesToSave);
+      const { error: imgErr } = await supabase.from("product_images").upsert(imagesToSave);
+      if (imgErr) console.warn("[SUPABASE_API] Warning upserting images:", imgErr);
     }
 
     // 3. Upsert Variants
     if (productData.product_variants && productData.product_variants.length > 0) {
       const variantsToSave = productData.product_variants.map((v: any, idx: number) => ({
-        id: v.id && v.id.length === 36 ? v.id : undefined,
+        id: isValidUUID(v.id) ? v.id : generateUUID(),
         product_id: productId,
-        sku: v.sku || `${code}-${v.colour?.substring(0, 3).toUpperCase() || "STD"}-${v.size || "M"}-${idx}`,
+        sku: v.sku || `${code}-${(v.colour || "STD").substring(0, 3).toUpperCase()}-${v.size || "M"}-${idx}`,
         size: v.size || "M",
         colour: v.colour || "Standard",
         stock_quantity: v.stock_quantity ?? 10,
@@ -103,7 +114,8 @@ export async function POST(request: Request) {
         is_active: v.is_active ?? true,
       }));
 
-      await supabase.from("product_variants").upsert(variantsToSave);
+      const { error: varErr } = await supabase.from("product_variants").upsert(variantsToSave);
+      if (varErr) console.warn("[SUPABASE_API] Warning upserting variants:", varErr);
     }
 
     return NextResponse.json({ success: true, productId });

@@ -1,4 +1,5 @@
 import { createClient } from "./client";
+import { generateUUID } from "@/lib/utils";
 import {
   Category,
   Product,
@@ -282,7 +283,7 @@ class AppStore {
         targetProduct = productData as Product;
       }
     } else {
-      const newId = `p-${Date.now()}`;
+      const newId = generateUUID();
       targetProduct = {
         id: newId,
         category_id: productData.category_id || this.categories[0]?.id || "",
