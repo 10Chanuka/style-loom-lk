@@ -411,19 +411,27 @@ function ProductDetailsContent() {
             </div>
           </div>
 
-          {/* Material & Care */}
-          <div className="space-y-2 text-xs bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-            {product.material && (
-              <div>
-                <strong className="text-slate-900 dark:text-white">Fabric / Material:</strong> {product.material}
-              </div>
-            )}
-            {product.care_instructions && (
-              <div>
-                <strong className="text-slate-900 dark:text-white">Care Instructions:</strong> {product.care_instructions}
-              </div>
-            )}
-          </div>
+          {/* Detailed Specifications & Story */}
+          {(product.full_description || product.material || product.care_instructions) && (
+            <div className="space-y-3 text-xs bg-slate-50 dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+              {product.full_description && (
+                <div>
+                  <strong className="text-slate-900 dark:text-white font-bold block mb-1">Product Details & Story:</strong>
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{product.full_description}</p>
+                </div>
+              )}
+              {product.material && (
+                <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+                  <strong className="text-slate-900 dark:text-white font-bold">Fabric & Composition:</strong> <span className="text-slate-600 dark:text-slate-300">{product.material}</span>
+                </div>
+              )}
+              {product.care_instructions && (
+                <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+                  <strong className="text-slate-900 dark:text-white font-bold">Garment Care Instructions:</strong> <span className="text-slate-600 dark:text-slate-300">{product.care_instructions}</span>
+                </div>
+              )}
+            </div>
+          )}
 
         </div>
       </div>

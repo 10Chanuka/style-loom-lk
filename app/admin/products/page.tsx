@@ -501,11 +501,15 @@ export default function AdminProductsPage() {
             {/* Basic Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Product Name *</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Product Title / Name *</label>
                 <Input
                   type="text"
                   value={editingProduct.name || ""}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    const autoSlug = newName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+                    setEditingProduct({ ...editingProduct, name: newName, slug: editingProduct.slug || autoSlug });
+                  }}
                   className="mt-1 text-xs"
                   placeholder="e.g. Minimalist Tropical Palm Tee"
                   required
@@ -519,6 +523,7 @@ export default function AdminProductsPage() {
                   value={editingProduct.product_code || ""}
                   onChange={(e) => setEditingProduct({ ...editingProduct, product_code: e.target.value })}
                   className="mt-1 text-xs"
+                  placeholder="e.g. TEE-PLM-01"
                   required
                 />
               </div>
@@ -561,23 +566,92 @@ export default function AdminProductsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Custom URL Slug & Toggles */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div className="sm:col-span-1">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">URL Slug</label>
+                <Input
+                  type="text"
+                  value={editingProduct.slug || ""}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, slug: e.target.value })}
+                  className="mt-1 text-xs font-mono"
+                  placeholder="e.g. tropical-palm-tee"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-4">
+                <input
+                  type="checkbox"
+                  id="featured-toggle"
+                  checked={editingProduct.featured || false}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, featured: e.target.checked })}
+                  className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand cursor-pointer"
+                />
+                <label htmlFor="featured-toggle" className="text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer flex items-center gap-1">
+                  <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" /> Featured on Homepage
+                </label>
+              </div>
+
+              <div className="flex items-center gap-2 pt-4">
+                <input
+                  type="checkbox"
+                  id="active-toggle"
+                  checked={editingProduct.is_active ?? true}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, is_active: e.target.checked })}
+                  className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600 cursor-pointer"
+                />
+                <label htmlFor="active-toggle" className="text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer">
+                  🟢 Published / Visible to Customers
+                </label>
+              </div>
+            </div>
+
+            {/* Short & Full Descriptions */}
+            <div className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Short Description</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Short Summary / Tagline</label>
                 <Input
                   type="text"
                   value={editingProduct.short_description || ""}
                   onChange={(e) => setEditingProduct({ ...editingProduct, short_description: e.target.value })}
                   className="mt-1 text-xs"
+                  placeholder="e.g. Relaxed-fit 100% breathable cotton tee with custom palm embroidery."
                 />
               </div>
+
               <div>
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Material / Fabric</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Full Detailed Product Story & Specifications</label>
+                <textarea
+                  rows={3}
+                  value={editingProduct.full_description || ""}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, full_description: e.target.value })}
+                  className="w-full mt-1 rounded-md border border-slate-300 p-2.5 text-xs bg-white focus:ring-2 focus:ring-brand focus:outline-none dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+                  placeholder="Enter full product details, fit guide, fabric texture, lining, design background, and recommended styling..."
+                />
+              </div>
+            </div>
+
+            {/* Fabric & Garment Care Instructions */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Fabric Composition / Material</label>
                 <Input
                   type="text"
                   value={editingProduct.material || ""}
                   onChange={(e) => setEditingProduct({ ...editingProduct, material: e.target.value })}
                   className="mt-1 text-xs"
+                  placeholder="e.g. 100% Combed Organic Cotton / Linen Blend"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Garment Care Instructions</label>
+                <textarea
+                  rows={2}
+                  value={editingProduct.care_instructions || ""}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, care_instructions: e.target.value })}
+                  className="w-full mt-1 rounded-md border border-slate-300 p-2 text-xs bg-white focus:ring-2 focus:ring-brand focus:outline-none dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+                  placeholder="e.g. Hand wash cold with gentle detergent. Do not bleach. Line dry in shade. Warm iron on reverse."
                 />
               </div>
             </div>
