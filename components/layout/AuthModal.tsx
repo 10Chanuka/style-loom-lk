@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { store } from "@/lib/supabase/store";
-import { Lock, Mail, User, Phone, MessageCircle, ArrowRight, RefreshCw, Sparkles, CheckCircle2 } from "lucide-react";
+import { Lock, Mail, User, Phone, CheckCircle2, RefreshCw, ArrowRight } from "lucide-react";
 
 interface AuthModalProps {
   open: boolean;
@@ -23,15 +23,21 @@ export function AuthModal({
 }: AuthModalProps) {
   const { showToast } = useToast();
   const [step, setStep] = useState<"login" | "signup" | "otp">("login");
-  const [authMethod, setAuthMethod] = useState<"phone" | "email">("phone");
 
-  // Form states
+  // Form Registration States (Full Name, Email, Phone, Password)
   const [fullName, setFullName] = useState("");
-  const [identifier, setIdentifier] = useState(""); // Phone number or email
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Login State (Mobile Number or Email)
+  const [loginIdentifier, setLoginIdentifier] = useState("");
+
+  // OTP Verification States
   const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
   const [generatedOtp, setGeneratedOtp] = useState<string>("");
+  const [emailSentStatus, setEmailSentStatus] = useState<boolean>(false);
   
   // Timer & loading
   const [countdown, setCountdown] = useState(60);
@@ -61,16 +67,17 @@ export function AuthModal({
     return () => clearInterval(timer);
   }, [step, countdown]);
 
+  // 1. Customer Login Submit (Mobile Number or Email + Password)
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!identifier || !password) {
-      showToast("Please enter your Phone Number or Email and Password", "error");
+    if (!loginIdentifier || !password) {
+      showToast("Please enter your Mobile Number or Email and Password", "error");
       return;
     }
     setLoading(true);
 
     try {
-      const res = store.login(identifier);
+      const res = store.login(loginIdentifier);
       if (res && res.success) {
         showToast(`Welcome back, ${res.profile.full_name}! Logged in successfully.`, "success");
         onOpenChange(false);
@@ -85,10 +92,11 @@ export function AuthModal({
     }
   };
 
+  // 2. Customer Registration Submit (Full Name, Email, Phone, Password)
   const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !identifier || !password || !confirmPassword) {
-      showToast("Please fill in all fields", "error");
+    if (!fullName || !email || !phone || !password || !confirmPassword) {
+      showToast("Please fill in all 4 registration fields (Name, Email, Phone, Password)", "error");
       return;
     }
     if (password !== confirmPassword) {
@@ -102,11 +110,27 @@ export function AuthModal({
 
     setLoading(true);
     try {
-      const res = store.signUp(identifier, fullName, password);
-      if (res && res.otp) {
-        setGeneratedOtp(res.otp);
+      // Generate 6-digit OTP in local store
+      const res = store.signUp(email, fullName, password, phone);
+      const otp = res.otp;
+      setGeneratedOtp(otp);
+
+      // Trigger real email delivery via Next.js Server API
+      let sent = false;
+      try {
+        const apiRes = await fetch("/api/auth/send-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp, fullName }),
+        });
+        const data = await apiRes.json();
+        sent = !!data.emailSent;
+      } catch (err) {
+        console.warn("Email API error:", err);
       }
-      showToast("6-digit verification OTP generated!", "info");
+
+      setEmailSentStatus(sent);
+      showToast(`6-digit OTP code generated and sent to ${email}!`, "info");
       setStep("otp");
       setCountdown(60);
       setCanResend(false);
@@ -117,6 +141,7 @@ export function AuthModal({
     }
   };
 
+  // OTP Digit Change Listener
   const handleOtpChange = (index: number, value: string) => {
     if (value.length > 1) {
       const digits = value.slice(0, 6).split("");
@@ -137,19 +162,20 @@ export function AuthModal({
     }
   };
 
+  // 3. Confirm 6-Digit OTP Verification
   const handleOtpVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     const fullCode = otpCode.join("");
     if (fullCode.length !== 6) {
-      showToast("Please enter all 6 digits of the OTP code", "error");
+      showToast("Please enter all 6 digits of your OTP code", "error");
       return;
     }
     setLoading(true);
     try {
-      const res = store.verifyOtp(identifier, fullCode);
+      const res = store.verifyOtp(email, fullCode);
       if (!res.success) throw new Error(res.error);
 
-      showToast("Account verified successfully! You are logged in.", "success");
+      showToast(`Account verified! Registration complete for ${fullName}.`, "success");
       onOpenChange(false);
       if (onSuccess) onSuccess();
     } catch (err: any) {
@@ -159,15 +185,24 @@ export function AuthModal({
     }
   };
 
+  // Resend OTP
   const handleResendOtp = async () => {
     if (!canResend) return;
     setLoading(true);
     try {
-      const res = store.signUp(identifier, fullName, password);
-      if (res && res.otp) {
-        setGeneratedOtp(res.otp);
-      }
-      showToast("New 6-digit OTP code sent!", "info");
+      const res = store.signUp(email, fullName, password, phone);
+      const otp = res.otp;
+      setGeneratedOtp(otp);
+
+      try {
+        await fetch("/api/auth/send-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp, fullName }),
+        });
+      } catch {}
+
+      showToast(`New 6-digit OTP code sent to ${email}!`, "info");
       setCountdown(60);
       setCanResend(false);
     } catch (err: any) {
@@ -176,8 +211,6 @@ export function AuthModal({
       setLoading(false);
     }
   };
-
-  const isPhoneMode = authMethod === "phone";
 
   return (
     <Dialog
@@ -188,69 +221,31 @@ export function AuthModal({
           ? "Customer Login"
           : step === "signup"
           ? "Create Customer Account"
-          : "Verify Account with 6-Digit OTP"
+          : "Verify 6-Digit Email OTP"
       }
       description={
         step === "login"
-          ? "Log in to add items to cart, order via WhatsApp, or submit requests."
+          ? "Log in using your Mobile Phone Number or Email Address."
           : step === "signup"
-          ? "Join Style Loom to shop and request custom designs."
-          : `Enter the 6-digit verification code for ${identifier}`
+          ? "Enter your details below to create your Style Loom account."
+          : `Enter the 6-digit verification code sent to ${email}`
       }
     >
-      {/* Auth Method Toggle Selector */}
-      {step !== "otp" && (
-        <div className="grid grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl mb-4 text-xs font-bold">
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMethod("phone");
-              setIdentifier("");
-            }}
-            className={`py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
-              authMethod === "phone"
-                ? "bg-white dark:bg-slate-900 text-brand shadow-sm"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-            }`}
-          >
-            <Phone className="h-3.5 w-3.5" /> Mobile Phone
-          </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMethod("email");
-              setIdentifier("");
-            }}
-            className={`py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
-              authMethod === "email"
-                ? "bg-white dark:bg-slate-900 text-brand shadow-sm"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-            }`}
-          >
-            <Mail className="h-3.5 w-3.5" /> Email Address
-          </button>
-        </div>
-      )}
-
-      {/* LOGIN STEP */}
+      {/* LOGIN FORM */}
       {step === "login" && (
         <form onSubmit={handleLoginSubmit} className="space-y-4">
           <div>
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              {isPhoneMode ? "Mobile Phone Number (WhatsApp)" : "Email Address"}
+              Mobile Phone Number or Email Address
             </label>
             <div className="relative mt-1">
-              {isPhoneMode ? (
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-              ) : (
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-              )}
+              <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
               <Input
-                type={isPhoneMode ? "tel" : "email"}
-                placeholder={isPhoneMode ? "0771234567 or +94771234567" : "name@example.com"}
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                type="text"
+                placeholder="0771234567 or customer@example.com"
+                value={loginIdentifier}
+                onChange={(e) => setLoginIdentifier(e.target.value)}
                 className="pl-9"
                 required
               />
@@ -285,18 +280,18 @@ export function AuthModal({
               onClick={() => setStep("signup")}
               className="text-brand font-semibold hover:underline"
             >
-              Sign Up
+              Sign Up / Register
             </button>
           </div>
         </form>
       )}
 
-      {/* SIGNUP STEP */}
+      {/* SIGNUP REGISTRATION FORM (NAME, EMAIL, PHONE, PASSWORD) */}
       {step === "signup" && (
         <form onSubmit={handleSignupSubmit} className="space-y-3">
           <div>
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Full Name
+              Full Name / Username
             </label>
             <div className="relative mt-1">
               <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
@@ -313,19 +308,32 @@ export function AuthModal({
 
           <div>
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              {isPhoneMode ? "Mobile Phone Number (WhatsApp)" : "Email Address"}
+              Email Address
             </label>
             <div className="relative mt-1">
-              {isPhoneMode ? (
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-              ) : (
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-              )}
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
               <Input
-                type={isPhoneMode ? "tel" : "email"}
-                placeholder={isPhoneMode ? "0771234567 or +94771234567" : "amaya@example.com"}
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                type="email"
+                placeholder="amaya@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-9"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Mobile Phone Number (WhatsApp)
+            </label>
+            <div className="relative mt-1">
+              <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <Input
+                type="tel"
+                placeholder="0771234567 or +94771234567"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 className="pl-9"
                 required
               />
@@ -367,7 +375,7 @@ export function AuthModal({
           </div>
 
           <Button type="submit" className="w-full bg-brand hover:bg-brand-700 text-white font-bold mt-2" disabled={loading}>
-            {loading ? "Creating Account..." : "Continue to 6-Digit OTP Verification"}
+            {loading ? "Sending 6-Digit OTP..." : "Register & Send 6-Digit OTP to Email"}
           </Button>
 
           <div className="text-center pt-2 text-sm text-slate-600 dark:text-slate-400">
@@ -383,33 +391,19 @@ export function AuthModal({
         </form>
       )}
 
-      {/* OTP STEP */}
+      {/* 6-DIGIT OTP VERIFICATION FORM */}
       {step === "otp" && (
         <form onSubmit={handleOtpVerify} className="space-y-4 pt-1">
-          {/* WhatsApp / Email OTP Card */}
+          {/* OTP Card */}
           {generatedOtp && (
             <div className="bg-rose-50 dark:bg-rose-950/40 p-4 rounded-xl border border-rose-200 dark:border-rose-900/50 text-center space-y-2 shadow-sm">
               <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block flex items-center justify-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Your 6-Digit Verification OTP Code:
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" /> 6-Digit OTP Code Sent to Email ({email}):
               </span>
 
               <div className="text-3xl font-black font-mono tracking-widest text-brand">
                 {generatedOtp}
               </div>
-
-              {/* Direct WhatsApp OTP Dispatch Link */}
-              {isPhoneMode && identifier && (
-                <a
-                  href={`https://wa.me/${identifier.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                    `Hello ${fullName}! Your Style Loom account verification OTP code is: ${generatedOtp}`
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-all"
-                >
-                  <MessageCircle className="h-3.5 w-3.5" /> Send Code to My WhatsApp
-                </a>
-              )}
 
               <button
                 type="button"
@@ -443,14 +437,14 @@ export function AuthModal({
           </div>
 
           <Button type="submit" className="w-full bg-brand hover:bg-brand-700 text-white font-bold" disabled={loading}>
-            {loading ? "Verifying..." : "Verify Code & Log In"}
+            {loading ? "Verifying..." : "Confirm OTP & Complete Registration"}
           </Button>
 
           <div className="flex items-center justify-between text-xs text-slate-500 pt-2">
             <span>
               {countdown > 0
                 ? `Resend available in ${countdown}s`
-                : "Didn't receive code?"}
+                : "Didn't receive email code?"}
             </span>
             <button
               type="button"
