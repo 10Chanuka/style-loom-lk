@@ -29,7 +29,7 @@ class AppStore {
       updated_at: new Date().toISOString(),
     },
   ];
-  private pendingOtps: Map<string, { otp: string; fullName: string; pass: string }> = new Map();
+  private pendingOtps: Map<string, { otp: string; fullName: string; pass: string; phone?: string }> = new Map();
   private currentUser: Profile | null = null;
   private cart: CartItem[] = [];
   private orders: Order[] = [];
@@ -136,27 +136,33 @@ class AppStore {
   }
 
   // Auth operations
-  signUp(email: string, fullName: string, pass: string) {
+  signUp(identifier: string, fullName: string, pass: string, phoneNum?: string) {
     const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    this.pendingOtps.set(email.toLowerCase(), { otp: randomOtp, fullName, pass });
-    console.log(`[AUTH] Sent 6-digit OTP to ${email}: ${randomOtp}`);
-    return { otp: randomOtp };
+    const key = identifier.trim().toLowerCase();
+    const phone = phoneNum || (key.includes("@") ? "" : key);
+    this.pendingOtps.set(key, { otp: randomOtp, fullName, pass, phone });
+    console.log(`[AUTH] Sent 6-digit OTP to ${key}: ${randomOtp}`);
+    return { otp: randomOtp, phone };
   }
 
-  verifyOtp(email: string, code: string) {
-    const key = email.toLowerCase();
+  verifyOtp(identifier: string, code: string) {
+    const key = identifier.trim().toLowerCase();
     const record = this.pendingOtps.get(key);
     
     if (code.length === 6) {
-      const existingIdx = this.profiles.findIndex((p) => p.email.toLowerCase() === key);
+      const existingIdx = this.profiles.findIndex(
+        (p) => p.email.toLowerCase() === key || (p.phone && p.phone.toLowerCase() === key)
+      );
       if (existingIdx !== -1) {
         this.currentUser = this.profiles[existingIdx];
       } else {
         const userId = `usr-${Date.now()}`;
+        const isEmail = key.includes("@");
         const newProfile: Profile = {
           id: userId,
-          full_name: record ? record.fullName : email.split("@")[0],
-          email: email,
+          full_name: record ? record.fullName : key.split("@")[0],
+          email: isEmail ? key : `${key.replace(/[^0-9]/g, "")}@mobile.styleloom.lk`,
+          phone: record?.phone || (isEmail ? "" : key),
           role: "customer",
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -171,27 +177,30 @@ class AppStore {
     return { success: false, error: "Please enter a valid 6-digit OTP code" };
   }
 
-  login(email: string) {
-    const existing = this.profiles.find((p) => p.email.toLowerCase() === email.toLowerCase());
+  login(identifier: string) {
+    const key = identifier.trim().toLowerCase();
+    const existing = this.profiles.find(
+      (p) => p.email.toLowerCase() === key || (p.phone && p.phone.toLowerCase() === key)
+    );
     if (existing) {
       this.currentUser = existing;
       this.saveToStorage();
       return { success: true, profile: existing };
     }
-    // Auto-create customer or admin profile if testing
-    const isAdmin = email.toLowerCase().includes("admin");
-    const newProf: Profile = {
+    const isEmail = key.includes("@");
+    const newProfile: Profile = {
       id: `usr-${Date.now()}`,
-      full_name: isAdmin ? "Administrator" : email.split("@")[0],
-      email: email,
-      role: isAdmin ? "admin" : "customer",
+      full_name: key.split("@")[0],
+      email: isEmail ? key : `${key.replace(/[^0-9]/g, "")}@mobile.styleloom.lk`,
+      phone: isEmail ? "" : key,
+      role: "customer",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    this.profiles.push(newProf);
-    this.currentUser = newProf;
+    this.profiles.push(newProfile);
+    this.currentUser = newProfile;
     this.saveToStorage();
-    return { success: true, profile: newProf };
+    return { success: true, profile: newProfile };
   }
 
   logout() {
