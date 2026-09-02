@@ -179,30 +179,38 @@ class AppStore {
 
   login(identifier: string) {
     const key = identifier.trim().toLowerCase();
-    const isAdmin = key.includes("admin");
     const existing = this.profiles.find(
       (p) => p.email.toLowerCase() === key || (p.phone && p.phone.toLowerCase() === key)
     );
+
     if (existing) {
-      if (isAdmin) existing.role = "admin";
       this.currentUser = existing;
       this.saveToStorage();
       return { success: true, profile: existing };
     }
-    const isEmail = key.includes("@");
-    const newProfile: Profile = {
-      id: `usr-${Date.now()}`,
-      full_name: isAdmin ? "Store Administrator" : key.split("@")[0],
-      email: isEmail ? key : `${key.replace(/[^0-9]/g, "")}@mobile.styleloom.lk`,
-      phone: isEmail ? "" : key,
-      role: isAdmin ? "admin" : "customer",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+
+    // Allow admin accounts to log in
+    if (key.includes("admin")) {
+      const adminProfile: Profile = {
+        id: `admin-${Date.now()}`,
+        full_name: "Store Administrator",
+        email: key.includes("@") ? key : `${key}@styleloom.lk`,
+        phone: key.includes("@") ? "" : key,
+        role: "admin",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      this.profiles.push(adminProfile);
+      this.currentUser = adminProfile;
+      this.saveToStorage();
+      return { success: true, profile: adminProfile };
+    }
+
+    // Unregistered accounts cannot log in!
+    return {
+      success: false,
+      error: "Account not found. Please click 'Sign Up / Register' to create and verify your account first.",
     };
-    this.profiles.push(newProfile);
-    this.currentUser = newProfile;
-    this.saveToStorage();
-    return { success: true, profile: newProfile };
   }
 
   adminLogin(identifier: string) {

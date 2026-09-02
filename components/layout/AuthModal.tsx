@@ -78,12 +78,12 @@ export function AuthModal({
 
     try {
       const res = store.login(loginIdentifier);
-      if (res && res.success) {
+      if (res && res.success && res.profile) {
         showToast(`Welcome back, ${res.profile.full_name}! Logged in successfully.`, "success");
         onOpenChange(false);
         if (onSuccess) onSuccess();
       } else {
-        throw new Error("Failed to log in");
+        showToast(res.error || "Account not found. Please click 'Sign Up / Register' to create your account first.", "error");
       }
     } catch (err: any) {
       showToast(err.message || "Failed to log in", "error");
