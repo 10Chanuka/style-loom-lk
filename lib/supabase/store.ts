@@ -75,6 +75,7 @@ class AppStore {
       localStorage.setItem("elegance_products", JSON.stringify(this.products));
       localStorage.setItem("elegance_categories", JSON.stringify(this.categories));
       localStorage.setItem("elegance_settings", JSON.stringify(this.siteSettings));
+      localStorage.setItem("elegance_profiles", JSON.stringify(this.profiles));
       localStorage.setItem("elegance_user", JSON.stringify(this.currentUser));
       localStorage.setItem("elegance_cart", JSON.stringify(this.cart));
       localStorage.setItem("elegance_orders", JSON.stringify(this.orders));
@@ -99,10 +100,19 @@ class AppStore {
         return;
       }
 
+      const prof = localStorage.getItem("elegance_profiles");
+      if (prof) {
+        const parsedProfiles: Profile[] = JSON.parse(prof);
+        parsedProfiles.forEach((p) => {
+          if (!this.profiles.some((ex) => ex.id === p.id || ex.email.toLowerCase() === p.email.toLowerCase())) {
+            this.profiles.push(p);
+          }
+        });
+      }
+
       const p = localStorage.getItem("elegance_products");
       if (p) {
         const parsedProducts: Product[] = JSON.parse(p);
-        // Enrich products that might be missing new fields or variants
         this.products = parsedProducts.map((prod) => {
           const initMatch = INITIAL_PRODUCTS.find((ip) => ip.id === prod.id);
           if (!prod.product_variants || prod.product_variants.length === 0) {
