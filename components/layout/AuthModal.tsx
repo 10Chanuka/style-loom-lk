@@ -394,28 +394,21 @@ export function AuthModal({
       {/* 6-DIGIT OTP VERIFICATION FORM */}
       {step === "otp" && (
         <form onSubmit={handleOtpVerify} className="space-y-4 pt-1">
-          {/* OTP Card */}
-          {generatedOtp && (
-            <div className="bg-rose-50 dark:bg-rose-950/40 p-4 rounded-xl border border-rose-200 dark:border-rose-900/50 text-center space-y-2 shadow-sm">
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block flex items-center justify-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" /> 6-Digit OTP Code Sent to Email ({email}):
-              </span>
-
-              <div className="text-3xl font-black font-mono tracking-widest text-brand">
-                {generatedOtp}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setOtpCode(generatedOtp.split(""));
-                }}
-                className="text-xs font-bold text-brand hover:underline flex items-center justify-center gap-1 mx-auto pt-1 block"
-              >
-                ⚡ Click to Auto-Fill 6-Digit Code ({generatedOtp})
-              </button>
+          {/* Email Sent Notification Card */}
+          <div className="bg-slate-50 dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-center space-y-2">
+            <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center mx-auto">
+              <Mail className="h-5 w-5" />
             </div>
-          )}
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">
+              We have sent a 6-digit verification code to:
+            </p>
+            <p className="text-sm font-extrabold text-brand font-mono">
+              {email}
+            </p>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Please check your email inbox (and spam folder) and enter the 6-digit code below to confirm your registration.
+            </p>
+          </div>
 
           <div className="flex items-center justify-center gap-2 pt-1">
             {otpCode.map((digit, idx) => (
