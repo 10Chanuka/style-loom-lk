@@ -24,14 +24,7 @@ export default function AdminLoginPage() {
 
     setLoading(true);
     try {
-      const res = store.login(email);
-      if (res.profile.role !== "admin") {
-        showToast("Access Denied: Your account does not have administrator privileges.", "error");
-        store.logout();
-        setLoading(false);
-        return;
-      }
-
+      const res = store.adminLogin(email);
       showToast("Welcome to Administrator Dashboard!", "success");
       router.push("/admin");
     } catch (err: any) {
