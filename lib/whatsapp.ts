@@ -71,12 +71,18 @@ interface CustomizationMessagePayload {
 export function buildWhatsAppCustomizationUrl(payload: CustomizationMessagePayload): string {
   const whatsappNumber = OFFICIAL_WHATSAPP_NUMBER;
 
+  // Determine site base URL dynamically in browser or env
+  let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  if (typeof window !== "undefined") {
+    siteUrl = window.location.origin;
+  }
+
   let imageNote = "None attached";
   if (payload.referenceImageUrl) {
-    if (payload.referenceImageUrl.startsWith("http")) {
+    if (payload.referenceImageUrl.startsWith("http://") || payload.referenceImageUrl.startsWith("https://")) {
       imageNote = payload.referenceImageUrl;
     } else {
-      imageNote = `📷 Reference Photo Attached (Saved with Request ${payload.requestNumber})`;
+      imageNote = `${siteUrl}/api/reference-image/${payload.requestNumber}`;
     }
   }
 
@@ -94,7 +100,7 @@ Preferred Colour: ${payload.preferredColour || "As discussed"}
 Preferred Fabric: ${payload.preferredFabric || "As recommended"}
 Design Placement / Style: ${payload.designPlacement || "Standard"}
 Design Details: ${payload.designDescription}
-Reference Image: ${imageNote}
+Reference Image Link: ${imageNote}
 Required Date: ${payload.requiredDate || "Flexible"}
 Estimated Budget: ${payload.estimatedBudget ? `LKR ${payload.estimatedBudget.toFixed(2)}` : "Not specified"}
 Notes: ${payload.notes || "None"}

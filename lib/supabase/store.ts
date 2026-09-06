@@ -492,6 +492,12 @@ class AppStore {
     return newReq;
   }
 
+  getCustomizationByRequestNumber(reqNum: string): CustomizationRequest | undefined {
+    return this.customizations.find(
+      (c) => c.request_number === reqNum || c.id === reqNum
+    );
+  }
+
   getCustomizations(userId?: string): CustomizationRequest[] {
     if (userId) {
       return this.customizations.filter((c) => c.user_id === userId);
