@@ -5,13 +5,16 @@ import { store } from "@/lib/supabase/store";
 import { CustomizationRequest } from "@/lib/supabase/mock-data";
 import { formatDate, formatLKR } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
-import { Scissors, MessageCircle, Eye, FileImage } from "lucide-react";
+import { Scissors, MessageCircle, Eye, FileImage, Download, ExternalLink, X } from "lucide-react";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Dialog } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function AdminCustomizationsPage() {
   const { showToast } = useToast();
-  const [customizations, setCustomizations] = useState<CustomizationRequest[]>(store.getCustomizations());
+  const [customizations, setCustomizations] = useState<CustomizationRequest[]>([]);
+  const [selectedImageModal, setSelectedImageModal] = useState<{ url: string; reqNum: string } | null>(null);
 
   const loadData = () => {
     setCustomizations(store.getCustomizations());
@@ -46,6 +49,8 @@ export default function AdminCustomizationsPage() {
         ) : (
           customizations.map((cust) => {
             const cleanPhone = cust.customer_phone.replace(/[^0-9]/g, "");
+            const imageUrl = cust.reference_image_url || `/api/reference-image/${cust.request_number}`;
+            
             return (
               <div key={cust.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4 dark:bg-slate-900 dark:border-slate-800">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
@@ -86,14 +91,36 @@ export default function AdminCustomizationsPage() {
                     <p><span className="text-slate-500">Estimated Budget:</span> {cust.estimated_budget ? formatLKR(cust.estimated_budget) : "Not set"}</p>
                   </div>
 
-                  {cust.reference_image_url && (
-                    <div className="flex items-center gap-2">
-                      <img src={cust.reference_image_url} alt="Reference" className="h-16 w-16 object-cover rounded-lg border border-slate-200" />
-                      <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                        <FileImage className="h-4 w-4" /> Reference Image Attached
+                  {/* Reference Image Container */}
+                  <div className="space-y-2">
+                    <span className="text-slate-500 block font-semibold">Reference Image:</span>
+                    {cust.reference_image_url ? (
+                      <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-200 dark:bg-slate-800 dark:border-slate-700">
+                        <img
+                          src={cust.reference_image_url}
+                          alt="Reference"
+                          className="h-16 w-16 object-cover rounded-lg border border-slate-300 dark:border-slate-600 shadow-sm cursor-pointer hover:opacity-90"
+                          onClick={() => setSelectedImageModal({ url: cust.reference_image_url!, reqNum: cust.request_number })}
+                        />
+                        <div className="space-y-1">
+                          <span className="text-[11px] text-emerald-600 font-extrabold flex items-center gap-1">
+                            <FileImage className="h-4 w-4" /> Photo Attached
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedImageModal({ url: cust.reference_image_url!, reqNum: cust.request_number })}
+                            className="text-[11px] font-bold text-brand hover:underline flex items-center gap-1"
+                          >
+                            <Eye className="h-3.5 w-3.5" /> View Full Image
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-[11px] text-slate-400 italic block pt-1">
+                        No reference photo attached
                       </span>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
@@ -108,7 +135,7 @@ export default function AdminCustomizationsPage() {
                     href={`https://wa.me/${cleanPhone}?text=Hello%20${encodeURIComponent(cust.customer_name)},%20regarding%20your%20customization%20request%20${cust.request_number}:`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3.5 py-2 rounded-lg text-xs"
+                    className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3.5 py-2 rounded-lg text-xs shadow-sm transition-colors"
                   >
                     <MessageCircle className="h-4 w-4" /> Discuss Quote on WhatsApp
                   </a>
@@ -118,6 +145,41 @@ export default function AdminCustomizationsPage() {
           })
         )}
       </div>
+
+      {/* FULL REFERENCE IMAGE MODAL DIALOG */}
+      {selectedImageModal && (
+        <Dialog
+          open={!!selectedImageModal}
+          onOpenChange={() => setSelectedImageModal(null)}
+          title={`Reference Photo — Request ${selectedImageModal.reqNum}`}
+          description="High-resolution customer artwork / reference image."
+        >
+          <div className="space-y-4 text-center py-2">
+            <div className="max-h-[70vh] overflow-hidden rounded-2xl border border-slate-200 shadow-lg dark:border-slate-800 bg-slate-950 flex items-center justify-center">
+              <img
+                src={selectedImageModal.url}
+                alt="Full Reference Artwork"
+                className="max-h-[65vh] w-auto object-contain mx-auto"
+              />
+            </div>
+
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <a
+                href={selectedImageModal.url}
+                target="_blank"
+                rel="noreferrer"
+                download={`reference_image_${selectedImageModal.reqNum}.png`}
+                className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow transition-colors"
+              >
+                <Download className="h-4 w-4" /> Download Original Image
+              </a>
+              <Button variant="outline" onClick={() => setSelectedImageModal(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </Dialog>
+      )}
     </div>
   );
 }
