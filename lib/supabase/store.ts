@@ -271,7 +271,13 @@ class AppStore {
 
   // Categories
   getCategories(): Category[] {
-    return this.categories;
+    return this.categories.map((cat) => {
+      const initMatch = INITIAL_CATEGORIES.find((ic) => ic.id === cat.id || ic.slug === cat.slug);
+      if (initMatch) {
+        cat.image_url = initMatch.image_url;
+      }
+      return cat;
+    });
   }
 
   getCategoryBySlug(slug: string): Category | undefined {
