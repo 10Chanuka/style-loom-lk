@@ -572,6 +572,8 @@ class AppStore {
 
   // Site Settings
   getSiteSettings(): SiteSettings {
+    this.siteSettings.whatsapp_number = "94741880953";
+    this.siteSettings.business_phone = "+94 74 188 0953";
     return this.siteSettings;
   }
 

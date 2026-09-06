@@ -581,7 +581,7 @@ export default function CustomizePage() {
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     className="text-xs"
-                    placeholder="+94 71 490 3231"
+                    placeholder="+94 74 188 0953"
                     required
                   />
                 </div>

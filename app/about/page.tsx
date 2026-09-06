@@ -118,7 +118,7 @@ export default function AboutPage() {
             rel="noreferrer"
             className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-lg text-sm shadow transition-colors"
           >
-            <MessageCircle className="h-5 w-5" /> Message +94 71 490 3231
+            <MessageCircle className="h-5 w-5" /> Message +94 74 188 0953
           </a>
           <Button asChild variant="outline" className="w-full text-slate-900 bg-white hover:bg-slate-100">
             <Link href="/customize">

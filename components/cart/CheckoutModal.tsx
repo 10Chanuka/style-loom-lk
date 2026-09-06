@@ -141,7 +141,7 @@ export function CheckoutModal({
               Ready to Send to WhatsApp
             </h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Our team at +94 71 490 3231 will confirm stock availability and delivery options immediately upon receiving your WhatsApp message.
+              Our team at +94 74 188 0953 will confirm stock availability and delivery options immediately upon receiving your WhatsApp message.
             </p>
           </div>
 
@@ -183,7 +183,7 @@ export function CheckoutModal({
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 className="mt-1 text-xs"
-                placeholder="+94 71 490 3231"
+                placeholder="+94 74 188 0953"
                 required
               />
             </div>
