@@ -125,7 +125,18 @@ class AppStore {
         });
       }
       const c = localStorage.getItem("elegance_categories");
-      if (c) this.categories = JSON.parse(c);
+      if (c) {
+        const parsedCats: Category[] = JSON.parse(c);
+        this.categories = parsedCats.map((cat) => {
+          const initMatch = INITIAL_CATEGORIES.find((ic) => ic.id === cat.id || ic.slug === cat.slug);
+          if (initMatch) {
+            cat.image_url = initMatch.image_url;
+          }
+          return cat;
+        });
+      } else {
+        this.categories = [...INITIAL_CATEGORIES];
+      }
       const s = localStorage.getItem("elegance_settings");
       if (s) this.siteSettings = JSON.parse(s);
       const u = localStorage.getItem("elegance_user");
