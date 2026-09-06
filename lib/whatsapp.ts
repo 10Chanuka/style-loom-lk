@@ -21,7 +21,7 @@ interface OrderMessagePayload {
 }
 
 export function buildWhatsAppOrderUrl(payload: OrderMessagePayload): string {
-  const whatsappNumber = payload.whatsappNumber || process.env.NEXT_PUBLIC_BUSINESS_WHATSAPP || "94714903231";
+  const whatsappNumber = payload.whatsappNumber || process.env.NEXT_PUBLIC_BUSINESS_WHATSAPP || "94741880953";
   
   let itemsText = "";
   payload.items.forEach((item, index) => {
@@ -67,7 +67,7 @@ interface CustomizationMessagePayload {
 }
 
 export function buildWhatsAppCustomizationUrl(payload: CustomizationMessagePayload): string {
-  const whatsappNumber = payload.whatsappNumber || process.env.NEXT_PUBLIC_BUSINESS_WHATSAPP || "94714903231";
+  const whatsappNumber = payload.whatsappNumber || process.env.NEXT_PUBLIC_BUSINESS_WHATSAPP || "94741880953";
 
   const rawMessage = `Hello, I would like to submit a Custom Clothing Request.
 

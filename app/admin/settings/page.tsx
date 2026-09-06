@@ -139,7 +139,7 @@ export default function AdminSettingsPage() {
                 className="mt-1 text-xs"
                 required
               />
-              <span className="text-[10px] text-slate-400">Target wa.me number (e.g. 94714903231)</span>
+              <span className="text-[10px] text-slate-400">Target wa.me number (e.g. 94741880953)</span>
             </div>
 
             <div>

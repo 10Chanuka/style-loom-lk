@@ -13,7 +13,7 @@ A modern, responsive, production-ready clothing e-commerce website specializing 
 2. **WhatsApp Order Checkout**:
    - Server-side price revalidation and order creation in Supabase (`orders` and `order_items`).
    - Unique order number generation (`ORD-YYYYMMDD-XXXX`).
-   - Automated URL-encoded WhatsApp message generation opening `https://wa.me/94714903231`.
+   - Automated URL-encoded WhatsApp message generation opening `https://wa.me/94741880953`.
 3. **Step-by-Step Customization Request**:
    - 5-step wizard for custom T-shirt prints, Kurta neck/sleeve embroidery, and blouse tailoring.
    - Reference image upload (JPG/PNG/WebP with 5MB validation) to Supabase Storage.

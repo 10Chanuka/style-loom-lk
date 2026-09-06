@@ -16,12 +16,12 @@ export function AnnouncementBar() {
             <Truck className="h-3.5 w-3.5 text-emerald-400" /> Standard Delivery 3-5 Days
           </span>
           <a
-            href="https://wa.me/94714903231"
+            href="https://wa.me/94741880953"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 hover:text-white transition-colors"
           >
-            <PhoneCall className="h-3.5 w-3.5 text-rose-400" /> WhatsApp: +94 71 490 3231
+            <PhoneCall className="h-3.5 w-3.5 text-rose-400" /> WhatsApp: +94 74 188 0953
           </a>
         </div>
       </div>
