@@ -160,7 +160,7 @@ export default function CustomizePage() {
         preferredFabric,
         designPlacement: placementCombined,
         designDescription,
-        referenceImageUrl: referenceImageUrl ? "(Uploaded Image Attached)" : undefined,
+        referenceImageUrl: referenceImageUrl || undefined,
         requiredDate,
         estimatedBudget: estimatedBudget ? parseFloat(estimatedBudget) : undefined,
         notes,
@@ -654,6 +654,20 @@ export default function CustomizePage() {
                     {customerName} ({customerPhone}) • {customerEmail}
                   </p>
                 </div>
+
+                {imagePreview && (
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                    <img src={imagePreview} alt="Reference Preview" className="h-14 w-14 object-cover rounded-lg border border-slate-300 shadow-sm" />
+                    <div>
+                      <span className="text-emerald-600 font-bold block text-[11px] flex items-center gap-1">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Reference Image Included with Receipt
+                      </span>
+                      <span className="text-[10px] text-slate-500 block">
+                        Saved in database and included in WhatsApp message receipt.
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-between pt-4">

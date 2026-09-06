@@ -71,6 +71,15 @@ interface CustomizationMessagePayload {
 export function buildWhatsAppCustomizationUrl(payload: CustomizationMessagePayload): string {
   const whatsappNumber = OFFICIAL_WHATSAPP_NUMBER;
 
+  let imageNote = "None attached";
+  if (payload.referenceImageUrl) {
+    if (payload.referenceImageUrl.startsWith("http")) {
+      imageNote = payload.referenceImageUrl;
+    } else {
+      imageNote = `📷 Reference Photo Attached (Saved with Request ${payload.requestNumber})`;
+    }
+  }
+
   const rawMessage = `Hello, I would like to submit a Custom Clothing Request.
 
 Request Number: ${payload.requestNumber}
@@ -85,7 +94,7 @@ Preferred Colour: ${payload.preferredColour || "As discussed"}
 Preferred Fabric: ${payload.preferredFabric || "As recommended"}
 Design Placement / Style: ${payload.designPlacement || "Standard"}
 Design Details: ${payload.designDescription}
-Reference Image: ${payload.referenceImageUrl || "None attached"}
+Reference Image: ${imageNote}
 Required Date: ${payload.requiredDate || "Flexible"}
 Estimated Budget: ${payload.estimatedBudget ? `LKR ${payload.estimatedBudget.toFixed(2)}` : "Not specified"}
 Notes: ${payload.notes || "None"}
