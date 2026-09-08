@@ -9,7 +9,7 @@ export function AnnouncementBar() {
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
         <div className="flex items-center gap-2">
           <Sparkles className="h-3.5 w-3.5 text-rose-400 animate-pulse" />
-          <span>Island-wide Delivery across Sri Lanka | Custom Printing & Tailoring Available</span>
+          <span>Island-wide Delivery across Sri Lanka | Premium Apparel Collections</span>
         </div>
         <div className="flex items-center gap-4 text-slate-300">
           <span className="flex items-center gap-1">

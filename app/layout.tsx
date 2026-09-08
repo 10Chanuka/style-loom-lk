@@ -10,8 +10,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Style Loom | Style That Speaks, Quality That Lasts",
-  description: "Style Loom — Style That Speaks, Quality That Lasts. Shop premium printed T-shirts (unisex), women Kurtas, and tailored Blouses in Sri Lanka. Custom clothing, fast islandwide delivery, and WhatsApp order support.",
-  keywords: ["Style Loom", "Clothing Sri Lanka", "Printed T Shirts Colombo", "Women Kurtas", "Tailored Blouses"],
+  description: "Style Loom — Style That Speaks, Quality That Lasts. Shop premium printed T-shirts (unisex), Long Kurtas, and Short Kurtas in Sri Lanka. Fast islandwide delivery and WhatsApp order support.",
+  keywords: ["Style Loom", "Clothing Sri Lanka", "Printed T Shirts Colombo", "Long Kurtas", "Short Kurtas"],
   icons: {
     icon: "/logo.jpg",
     shortcut: "/logo.jpg",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Style Loom | Style That Speaks, Quality That Lasts",
-    description: "Shop premium printed T-shirts (unisex), women Kurtas, and tailored Blouses in Sri Lanka.",
+    description: "Shop premium printed T-shirts (unisex), Long Kurtas, and Short Kurtas in Sri Lanka.",
     url: "https://styleloom.lk",
     siteName: "Style Loom",
     locale: "en_LK",

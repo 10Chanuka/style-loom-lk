@@ -94,7 +94,7 @@ export function Navbar() {
             <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-sm relative">
               <input
                 type="text"
-                placeholder="Search T-shirts, Kurtas, Blouses..."
+                placeholder="Search T-shirts, Long Kurtas, Short Kurtas..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-1.5 text-sm rounded-full border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand dark:bg-slate-800 dark:border-slate-700"
@@ -115,12 +115,6 @@ export function Navbar() {
                 className={pathname.startsWith("/products") ? "text-brand font-semibold" : "text-slate-700 hover:text-brand dark:text-slate-200"}
               >
                 Shop All
-              </Link>
-              <Link
-                href="/customize"
-                className={isCurrent("/customize") ? "text-brand font-semibold flex items-center gap-1" : "text-slate-700 hover:text-brand flex items-center gap-1 dark:text-slate-200"}
-              >
-                <Scissors className="h-4 w-4 text-brand" /> Customize
               </Link>
               <Link
                 href="/about"
@@ -218,13 +212,6 @@ export function Navbar() {
                 className="px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 Shop All Products
-              </Link>
-              <Link
-                href="/customize"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-brand font-semibold"
-              >
-                <Scissors className="h-4 w-4" /> Customize Products
               </Link>
               <Link
                 href="/about"

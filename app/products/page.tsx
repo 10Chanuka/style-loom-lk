@@ -30,9 +30,15 @@ function ProductsContent() {
   });
 
   useEffect(() => {
-    store.syncWithSupabase().then(() => {
+    const updateState = () => {
       setCategories(store.getCategories());
       setProducts(store.getProducts());
+    };
+    // Instant local load
+    updateState();
+    // Non-blocking background sync
+    store.syncWithSupabase().then(() => {
+      updateState();
     });
   }, []);
 
@@ -111,7 +117,7 @@ function ProductsContent() {
           Clothing Collection
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Browse our full range of printed T-shirts, Kurtas, and tailored Blouses.
+          Browse our full range of printed T-shirts, Long Kurtas, and Short Kurtas.
         </p>
       </div>
 

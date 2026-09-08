@@ -26,41 +26,41 @@ const SLIDES: SlideItem[] = [
     tagline: "ELEGANCE FASHION",
     primaryButtonText: "Explore Collection",
     primaryButtonLink: "/products",
-    secondaryButtonText: "Custom Design",
-    secondaryButtonLink: "/customize",
+    secondaryButtonText: "Shop T-Shirts",
+    secondaryButtonLink: "/category/t-shirts",
   },
   {
     id: 2,
     image: "/images/slider/hero-2.jpg",
-    title: "Our Customize T-Shirt Collection",
-    subtitle: "Wear your story. Create your style. Premium quality t-shirts made for connection.",
+    title: "Unisex Printed Graphic T-Shirts",
+    subtitle: "Wear your story. Premium 100% combed cotton T-shirts with vibrant, long-lasting prints.",
     tagline: "UNISEX T-SHIRTS",
     primaryButtonText: "Shop T-Shirts",
     primaryButtonLink: "/category/t-shirts",
-    secondaryButtonText: "Start Customizing",
-    secondaryButtonLink: "/customize",
+    secondaryButtonText: "View All Products",
+    secondaryButtonLink: "/products",
   },
   {
     id: 3,
     image: "/images/slider/hero-3.jpg",
     title: "Introducing Our Debut Collection",
-    subtitle: "Festive Kurthas & Modern Elegance. Traditional Sri Lankan craftsmanship meets modern fit.",
+    subtitle: "Festive Long & Short Kurtas. Traditional Sri Lankan craftsmanship meets modern fit.",
     tagline: "NEW ARRIVALS",
-    primaryButtonText: "Shop Kurthas",
-    primaryButtonLink: "/category/kurtas",
-    secondaryButtonText: "View All Products",
-    secondaryButtonLink: "/products",
+    primaryButtonText: "Shop Long Kurtas",
+    primaryButtonLink: "/category/long-kurtas",
+    secondaryButtonText: "Shop Short Kurtas",
+    secondaryButtonLink: "/category/short-kurtas",
   },
   {
     id: 4,
     image: "/images/slider/hero-4.jpg",
-    title: "Customize Your T-Shirt",
-    subtitle: "Premium Quality & All Day Comfort. Print your custom logo, text, or graphic design.",
-    tagline: "CUSTOM PRINTING",
-    primaryButtonText: "Request Custom Design",
-    primaryButtonLink: "/customize",
-    secondaryButtonText: "Browse Shop",
-    secondaryButtonLink: "/products",
+    title: "Premium Island Fashion Drops",
+    subtitle: "High density bio-washed fabrics, rich threadwork, and islandwide delivery across Sri Lanka.",
+    tagline: "EXCLUSIVE APPAREL",
+    primaryButtonText: "Browse Collection",
+    primaryButtonLink: "/products",
+    secondaryButtonText: "About Style Loom",
+    secondaryButtonLink: "/about",
   },
 ];
 
@@ -130,6 +130,8 @@ export function HeroSlider() {
                 <img
                   src={slide.image}
                   alt=""
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover opacity-30 blur-xl scale-110"
                 />
 
@@ -137,6 +139,8 @@ export function HeroSlider() {
                 <img
                   src={slide.image}
                   alt={slide.title}
+                  loading={isCenter ? "eager" : "lazy"}
+                  decoding="async"
                   className="relative max-w-full max-h-full object-contain mx-auto transition-transform duration-500 hover:scale-[1.02]"
                 />
 
@@ -175,7 +179,6 @@ export function HeroSlider() {
                     {slide.secondaryButtonText && (
                       <Button asChild variant="outline" size="sm" className="bg-white hover:bg-slate-100 text-slate-950 font-extrabold shadow-xl border-white text-xs px-4 py-2 rounded-xl">
                         <Link href={slide.secondaryButtonLink || "/products"}>
-                          <Scissors className="mr-1.5 h-3.5 w-3.5 text-rose-600" />
                           {slide.secondaryButtonText}
                         </Link>
                       </Button>

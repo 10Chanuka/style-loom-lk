@@ -90,12 +90,12 @@ class AppStore {
   private loadFromStorage() {
     if (typeof window === "undefined") return;
     try {
-      const v = localStorage.getItem("elegance_store_v3");
+      const v = localStorage.getItem("elegance_store_v5");
       if (!v) {
-        localStorage.setItem("elegance_store_v3", "3.0");
-        localStorage.setItem("elegance_products", JSON.stringify(INITIAL_PRODUCTS));
+        localStorage.setItem("elegance_store_v5", "5.0");
+        localStorage.setItem("elegance_products", JSON.stringify([]));
         localStorage.setItem("elegance_categories", JSON.stringify(INITIAL_CATEGORIES));
-        this.products = [...INITIAL_PRODUCTS];
+        this.products = [];
         this.categories = [...INITIAL_CATEGORIES];
         return;
       }
@@ -112,17 +112,9 @@ class AppStore {
 
       const p = localStorage.getItem("elegance_products");
       if (p) {
-        const parsedProducts: Product[] = JSON.parse(p);
-        this.products = parsedProducts.map((prod) => {
-          const initMatch = INITIAL_PRODUCTS.find((ip) => ip.id === prod.id);
-          if (!prod.product_variants || prod.product_variants.length === 0) {
-            prod.product_variants = initMatch?.product_variants || prod.product_variants;
-          }
-          if (!prod.product_images || prod.product_images.length === 0) {
-            prod.product_images = initMatch?.product_images || prod.product_images;
-          }
-          return prod;
-        });
+        this.products = JSON.parse(p);
+      } else {
+        this.products = [];
       }
       const c = localStorage.getItem("elegance_categories");
       if (c) {
@@ -281,6 +273,19 @@ class AppStore {
   }
 
   getCategoryBySlug(slug: string): Category | undefined {
+    if (slug === "kurtas") {
+      return {
+        id: "kurtas-parent-id",
+        name: "Kurtas",
+        slug: "kurtas",
+        description: "Explore our signature handcrafted Kurtas, available in both elegant Long Kurtas and modern Short Kurtas.",
+        image_url: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80",
+        is_active: true,
+        display_order: 2,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+    }
     return this.categories.find((c) => c.slug === slug);
   }
 
@@ -316,9 +321,14 @@ class AppStore {
   async syncWithSupabase() {
     if (typeof window === "undefined") return;
     try {
-      // 1. Fetch from Server API (bypasses RLS & syncs DB to all devices)
-      const res = await fetch("/api/products");
-      if (res.ok) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
+
+      // 1. Fetch from Server API with fast timeout
+      const res = await fetch("/api/products", { signal: controller.signal }).catch(() => null);
+      clearTimeout(timeoutId);
+
+      if (res && res.ok) {
         const json = await res.json();
         if (json.products && Array.isArray(json.products) && json.products.length > 0) {
           this.products = json.products.map((p: any) => ({
@@ -336,7 +346,9 @@ class AppStore {
         const { data: catData } = await client
           .from("categories")
           .select("*")
-          .order("display_order", { ascending: true });
+          .order("display_order", { ascending: true })
+          .abortSignal(AbortSignal.timeout(1500))
+          .catch(() => ({ data: null }));
 
         if (catData && catData.length > 0) {
           this.categories = catData;

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { store } from "@/lib/supabase/store";
 import {
   Sparkles,
-  Scissors,
   Truck,
   ShieldCheck,
   RotateCcw,
@@ -34,7 +33,7 @@ export default function AboutPage() {
           <Sparkles className="h-4 w-4" /> About {settings.business_name}
         </div>
         <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Crafting Island Style & Timeless Tailoring
+          Crafting Island Style & Premium Quality
         </h1>
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
           {settings.about_content}
@@ -46,7 +45,7 @@ export default function AboutPage() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Our Mission & Craftsmanship</h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-            At {settings.business_name}, we believe fashion should combine everyday comfort with distinctive island elegance. Every printed T-shirt is printed using high-density bio-washed cotton, our Kurtas feature authentic handcrafted embroidery, and our Blouses are engineered for superior fit and comfort.
+            At {settings.business_name}, we believe fashion should combine everyday comfort with distinctive island elegance. Every T-shirt is printed using high-density bio-washed cotton, and our Long & Short Kurtas feature authentic handcrafted embroidery and premium linen blends.
           </p>
           <div className="space-y-2 pt-2 text-xs font-semibold text-slate-800 dark:text-slate-200">
             <div className="flex items-center gap-2">
@@ -64,7 +63,7 @@ export default function AboutPage() {
         <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800">
           <img
             src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop&q=80"
-            alt="Tailoring Workshop"
+            alt="Apparel Workshop"
             className="h-full w-full object-cover"
           />
         </div>
@@ -96,7 +95,7 @@ export default function AboutPage() {
         <div className="lg:col-span-2 space-y-3">
           <h3 className="text-2xl font-bold">Contact Our Store Team</h3>
           <p className="text-xs text-slate-300">
-            Have questions about sizes, upcoming drops, or custom orders? Reach out directly via WhatsApp or visit our Colombo store location.
+            Have questions about sizes, upcoming drops, or orders? Reach out directly via WhatsApp or visit our Colombo store location.
           </p>
           <div className="space-y-2 text-xs text-slate-300 pt-2">
             <p className="flex items-center gap-2">
@@ -120,9 +119,9 @@ export default function AboutPage() {
           >
             <MessageCircle className="h-5 w-5" /> Message +94 74 188 0953
           </a>
-          <Button asChild variant="outline" className="w-full text-slate-900 bg-white hover:bg-slate-100">
-            <Link href="/customize">
-              <Scissors className="mr-2 h-4 w-4 text-brand" /> Custom Clothing Form
+          <Button asChild variant="outline" className="w-full text-slate-900 bg-white hover:bg-slate-100 font-bold">
+            <Link href="/products">
+              <ArrowRight className="mr-2 h-4 w-4 text-brand" /> Browse Shop Collection
             </Link>
           </Button>
         </div>

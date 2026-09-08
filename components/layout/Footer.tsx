@@ -73,13 +73,10 @@ export function Footer() {
                 <Link href="/category/t-shirts" className="hover:text-brand transition-colors">Printed T-Shirts</Link>
               </li>
               <li>
-                <Link href="/category/kurtas" className="hover:text-brand transition-colors">Women Kurtas</Link>
+                <Link href="/category/long-kurtas" className="hover:text-brand transition-colors">Long Kurtas</Link>
               </li>
               <li>
-                <Link href="/category/blouses" className="hover:text-brand transition-colors">Tailored Blouses</Link>
-              </li>
-              <li>
-                <Link href="/customize" className="text-brand font-semibold hover:underline">Custom Design Request</Link>
+                <Link href="/category/short-kurtas" className="hover:text-brand transition-colors">Short Kurtas</Link>
               </li>
             </ul>
           </div>

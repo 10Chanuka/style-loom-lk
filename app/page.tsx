@@ -8,7 +8,6 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles,
-  Scissors,
   Truck,
   ShieldCheck,
   RotateCcw,
@@ -27,11 +26,19 @@ export default function HomePage() {
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SITE_SETTINGS);
 
   useEffect(() => {
-    store.syncWithSupabase().then(() => {
+    const updateLocalState = () => {
       setCategories(store.getCategories());
       setProducts(store.getProducts());
       setReviews(store.getAllReviews().filter((r) => r.status === "approved"));
       setSettings(store.getSiteSettings());
+    };
+
+    // Instant 0ms load from memory
+    updateLocalState();
+
+    // Non-blocking background sync
+    store.syncWithSupabase().then(() => {
+      updateLocalState();
     });
   }, []);
 
@@ -52,7 +59,7 @@ export default function HomePage() {
               Explore Our Signature Collections
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-              Carefully curated unisex printed T-shirts, elegant Kurtas, and tailored Blouses.
+              Carefully curated unisex printed T-shirts, elegant Long Kurtas, and chic Short Kurtas.
             </p>
           </div>
         </div>
@@ -106,41 +113,17 @@ export default function HomePage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </section>
-
-      {/* Customization Request Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-rose-950 to-slate-950 text-white p-8 sm:p-12 shadow-2xl border border-rose-900/40">
-          <div className="relative z-10 max-w-2xl space-y-6">
-            <div className="inline-flex items-center gap-2 bg-rose-500/20 text-rose-300 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-              <Scissors className="h-3.5 w-3.5 text-brand" /> Made-To-Order Tailoring
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Have a Custom Printed T-Shirt, Kurta or Blouse Idea?
-            </h2>
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              Upload your reference photo, pick your preferred fabric, color, and neck/sleeve specs. Our expert tailoring team in Sri Lanka will bring your vision to life.
-            </p>
-            <div className="pt-2 flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-brand hover:bg-brand-700 font-bold">
-                <Link href="/customize">Start Custom Request Form</Link>
-              </Button>
-              <a
-                href={`https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent("Hi Style Loom! I would like to inquire about a custom clothing order.")}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors"
-              >
-                <MessageCircle className="h-4 w-4" /> Ask via WhatsApp
-              </a>
-            </div>
+        {featuredProducts.length === 0 ? (
+          <div className="p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800 text-xs">
+            No featured products available yet. Add your new products from the Administrator Portal!
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* New Arrivals Section */}
@@ -151,7 +134,7 @@ export default function HomePage() {
               New Arrivals
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-              Fresh printed graphic tees, linen Kurtas, and designer saree blouses.
+              Fresh printed graphic tees, elegant Long Kurtas, and contemporary Short Kurtas.
             </p>
           </div>
           <Button asChild variant="outline" size="sm">
@@ -159,11 +142,17 @@ export default function HomePage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {newArrivals.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {newArrivals.length === 0 ? (
+          <div className="p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800 text-xs">
+            New collection drops arriving soon! Add products via Admin Panel.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {newArrivals.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Why Choose Us */}
@@ -191,11 +180,11 @@ export default function HomePage() {
 
           <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
             <div className="p-3 bg-amber-500/10 text-amber-600 rounded-xl w-fit">
-              <Scissors className="h-6 w-6" />
+              <ShieldCheck className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-slate-900 dark:text-white text-base">Custom Design Wizard</h3>
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">Premium Fabric Quality</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Tailored prints, Kurta embroidery, and custom blouse fitting options.
+              Crafted from 100% bio-washed cotton and pure linen for all-day breathability.
             </p>
           </div>
 
