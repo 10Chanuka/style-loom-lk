@@ -176,16 +176,16 @@ CREATE TABLE IF NOT EXISTS public.feedback (
 -- 12. SITE SETTINGS TABLE
 CREATE TABLE IF NOT EXISTS public.site_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  business_name TEXT NOT NULL DEFAULT 'Elegance Fashion Sri Lanka',
+  business_name TEXT NOT NULL DEFAULT 'Style Loom LK',
   logo_url TEXT,
-  business_email TEXT NOT NULL DEFAULT 'info@elegancefashion.lk',
+  business_email TEXT NOT NULL DEFAULT 'Styleloom2050@gmail.com',
   business_phone TEXT NOT NULL DEFAULT '+94 74 188 0953',
   whatsapp_number TEXT NOT NULL DEFAULT '94741880953',
-  address TEXT NOT NULL DEFAULT 'No. 123, High Level Road, Colombo, Sri Lanka',
+  address TEXT NOT NULL DEFAULT 'No 432/1B, Sri Vijaya Road, Palanwaththa, Pannipitiya.',
   about_content TEXT NOT NULL DEFAULT 'At Elegance Fashion, we craft premium printed T-shirts, elegant women Kurtas, and beautifully structured Blouses tailored with love and precision.',
   delivery_information TEXT NOT NULL DEFAULT 'Island-wide delivery within 3-5 working days. Flat rate shipping fee LKR 350 across Sri Lanka.',
   return_policy TEXT NOT NULL DEFAULT '7-day easy exchange policy for size exchanges or manufacturing defects. Returned items must be unworn and in original condition.',
-  social_links JSONB DEFAULT '{"facebook": "https://facebook.com", "instagram": "https://instagram.com", "tiktok": "https://tiktok.com"}'::jsonb,
+  social_links JSONB DEFAULT '{"facebook": "https://www.facebook.com/share/1EbZ7FjzoQ/", "instagram": "https://www.instagram.com/style__loom__", "tiktok": "https://www.tiktok.com/@styleloom2050"}'::jsonb,
   primary_colour TEXT NOT NULL DEFAULT '#E11D48',
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

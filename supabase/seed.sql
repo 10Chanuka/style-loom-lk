@@ -7,8 +7,8 @@
 INSERT INTO public.categories (id, name, slug, description, image_url, is_active, display_order)
 VALUES
   ('11111111-0000-0000-0000-000000000001', 'T-Shirts', 't-shirts', 'Premium printed cotton unisex T-shirts with modern artistic graphics and soft breathability.', 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80', true, 1),
-  ('22222222-0000-0000-0000-000000000002', 'Kurtas', 'kurtas', 'Elegant women Kurtas featuring intricate handcrafted embroidery, linen blends, and modern silhouettes.', 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop&q=80', true, 2),
-  ('33333333-0000-0000-0000-000000000003', 'Blouses', 'blouses', 'Tailored women Blouses designed for formal elegance, casual chic, and saree pairing perfection.', 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?w=800&auto=format&fit=crop&q=80', true, 3)
+  ('22222222-0000-0000-0000-000000000002', 'Long Kurtas', 'long-kurtas', 'Elegant floor and calf-length women Kurtas featuring premium fabric blends and modern silhouettes.', 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop&q=80', true, 2),
+  ('33333333-0000-0000-0000-000000000003', 'Short Kurtas', 'short-kurtas', 'Chic waist and hip-length short Kurtas designed for casual elegance and daily comfort.', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80', true, 3)
 ON CONFLICT (slug) DO NOTHING;
 
 -- 2. INSERT PRODUCTS
@@ -294,14 +294,14 @@ VALUES (
   'f1000000-0000-0000-0000-000000000001',
   'Style Loom',
   '/logo.jpg',
-  'info@styleloom.lk',
+  'Styleloom2050@gmail.com',
   '+94 74 188 0953',
   '94741880953',
-  'No. 123, High Level Road, Nugegoda, Colombo, Sri Lanka',
+  'No 432/1B, Sri Vijaya Road, Palanwaththa, Pannipitiya.',
   'Style That Speaks, Quality That Lasts. Welcome to Style Loom, your premier destination for high-quality printed T-shirts, handcrafted women Kurtas, and exquisitely tailored saree and modern Blouses in Sri Lanka.',
   'We offer fast island-wide delivery across Sri Lanka within 3 to 5 business days. A flat shipping rate of LKR 350 applies to all standard orders. Express Colombo delivery is available upon request.',
   'We offer a 7-day hassle-free size exchange policy. If your item does not fit perfectly, contact our team via WhatsApp to arrange a replacement. Items must be unworn with original tags attached.',
-  '{"facebook": "https://facebook.com/styleloomlk", "instagram": "https://instagram.com/styleloomlk", "tiktok": "https://tiktok.com/@styleloomlk"}'::jsonb,
+  '{"facebook": "https://www.facebook.com/share/1EbZ7FjzoQ/", "instagram": "https://www.instagram.com/style__loom__", "tiktok": "https://www.tiktok.com/@styleloom2050"}'::jsonb,
   '#e11d48'
 )
 ON CONFLICT (id) DO NOTHING;
