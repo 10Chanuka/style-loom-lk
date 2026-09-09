@@ -322,15 +322,15 @@ class AppStore {
     if (typeof window === "undefined") return;
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1500);
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-      // 1. Fetch from Server API with fast timeout
+      // 1. Fetch from Server API with generous timeout
       const res = await fetch("/api/products", { signal: controller.signal }).catch(() => null);
       clearTimeout(timeoutId);
 
       if (res && res.ok) {
         const json = await res.json();
-        if (json.products && Array.isArray(json.products) && json.products.length > 0) {
+        if (json.products && Array.isArray(json.products)) {
           this.products = json.products.map((p: any) => ({
             ...p,
             product_images: p.product_images || [],
@@ -347,7 +347,7 @@ class AppStore {
           .from("categories")
           .select("*")
           .order("display_order", { ascending: true })
-          .abortSignal(AbortSignal.timeout(1500))
+          .abortSignal(AbortSignal.timeout(6000))
           .catch(() => ({ data: null }));
 
         if (catData && catData.length > 0) {

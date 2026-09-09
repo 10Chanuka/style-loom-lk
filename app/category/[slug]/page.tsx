@@ -19,12 +19,21 @@ export default function CategoryPage() {
   const [allProducts, setAllProducts] = useState(store.getProducts());
 
   useEffect(() => {
-    const cat = store.getCategoryBySlug(slug);
-    setCategory(cat);
-    setAllProducts(store.getProducts());
+    const updateLocalState = () => {
+      const cat = store.getCategoryBySlug(slug);
+      setCategory(cat);
+      setAllProducts(store.getProducts());
+    };
+
+    updateLocalState();
     if (slug === "long-kurtas") setActiveKurtaTab("long");
     else if (slug === "short-kurtas") setActiveKurtaTab("short");
     else if (slug === "kurtas") setActiveKurtaTab("all");
+
+    // Non-blocking background sync from cloud database
+    store.syncWithSupabase().then(() => {
+      updateLocalState();
+    });
   }, [slug]);
 
   if (!category) {

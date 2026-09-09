@@ -42,8 +42,9 @@ export default function HomePage() {
     });
   }, []);
 
-  const featuredProducts = products.filter((p) => p.featured && p.is_active);
-  const newArrivals = [...products].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 4);
+  const explicitFeatured = products.filter((p) => p.featured && p.is_active);
+  const featuredProducts = explicitFeatured.length > 0 ? explicitFeatured : products.filter((p) => p.is_active);
+  const newArrivals = [...products].filter((p) => p.is_active).sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()).slice(0, 4);
 
   return (
     <div className="space-y-16 lg:space-y-24 pb-16">
