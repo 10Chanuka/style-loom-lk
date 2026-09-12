@@ -161,10 +161,9 @@ export function Navbar() {
               ) : (
                 <div className="hidden sm:flex items-center gap-2">
                   <Button
-                    variant="outline"
                     size="sm"
                     onClick={() => openAuth("login")}
-                    className="border-[#D4AF37]/50 text-white hover:bg-white/10 hover:text-white text-xs font-semibold"
+                    className="bg-white text-[#D4AF37] border border-[#D4AF37] hover:bg-amber-50 hover:text-[#B8860B] text-xs font-bold shadow-sm"
                   >
                     Login
                   </Button>
@@ -256,7 +255,10 @@ export function Navbar() {
                   </>
                 ) : (
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1" onClick={() => openAuth("login")}>
+                    <Button
+                      onClick={() => openAuth("login")}
+                      className="flex-1 bg-white text-[#D4AF37] border border-[#D4AF37] hover:bg-amber-50 hover:text-[#B8860B] font-bold text-xs shadow-sm"
+                    >
                       Login
                     </Button>
                     <Button className="flex-1" onClick={() => openAuth("signup")}>
