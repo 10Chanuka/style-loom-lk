@@ -11,6 +11,13 @@ export function Footer() {
 
   useEffect(() => {
     setSettings(store.getSiteSettings());
+    const unsub = store.subscribe(() => {
+      setSettings(store.getSiteSettings());
+    });
+    store.syncWithSupabase().then(() => {
+      setSettings(store.getSiteSettings());
+    });
+    return () => unsub();
   }, []);
 
   return (

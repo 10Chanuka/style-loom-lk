@@ -87,6 +87,21 @@ class AppStore {
     }
   }
 
+  private listeners: Set<() => void> = new Set();
+
+  subscribe(listener: () => void) {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  private notify() {
+    if (typeof window !== "undefined") {
+      this.listeners.forEach((l) => l());
+    }
+  }
+
   private loadFromStorage() {
     if (typeof window === "undefined") return;
     try {
@@ -97,6 +112,7 @@ class AppStore {
         localStorage.setItem("elegance_categories", JSON.stringify(INITIAL_CATEGORIES));
         this.products = [];
         this.categories = [...INITIAL_CATEGORIES];
+        this.siteSettings = { ...INITIAL_SITE_SETTINGS };
         return;
       }
 
@@ -130,7 +146,15 @@ class AppStore {
         this.categories = [...INITIAL_CATEGORIES];
       }
       const s = localStorage.getItem("elegance_settings");
-      if (s) this.siteSettings = JSON.parse(s);
+      if (s) {
+        try {
+          this.siteSettings = { ...INITIAL_SITE_SETTINGS, ...JSON.parse(s) };
+        } catch {
+          this.siteSettings = { ...INITIAL_SITE_SETTINGS };
+        }
+      } else {
+        this.siteSettings = { ...INITIAL_SITE_SETTINGS };
+      }
       const u = localStorage.getItem("elegance_user");
       if (u) this.currentUser = JSON.parse(u);
       const ct = localStorage.getItem("elegance_cart");
@@ -352,8 +376,28 @@ class AppStore {
 
         if (catData && catData.length > 0) {
           this.categories = catData;
-          this.saveToStorage();
         }
+
+        const { data: setData } = await client
+          .from("site_settings")
+          .select("*")
+          .limit(1)
+          .maybeSingle()
+          .abortSignal(AbortSignal.timeout(6000))
+          .catch(() => ({ data: null }));
+
+        if (setData) {
+          this.siteSettings = {
+            ...this.siteSettings,
+            ...setData,
+            social_links: typeof setData.social_links === "string"
+              ? JSON.parse(setData.social_links)
+              : setData.social_links || this.siteSettings.social_links,
+          };
+        }
+
+        this.saveToStorage();
+        this.notify();
       }
     } catch (err) {
       console.warn("[SUPABASE] Sync warning:", err);
@@ -607,18 +651,39 @@ class AppStore {
 
   // Site Settings
   getSiteSettings(): SiteSettings {
-    this.siteSettings.whatsapp_number = "94741880953";
-    this.siteSettings.business_phone = "+94 74 188 0953";
     return this.siteSettings;
   }
 
-  updateSiteSettings(update: Partial<SiteSettings>) {
+  async updateSiteSettings(update: Partial<SiteSettings>) {
     this.siteSettings = {
       ...this.siteSettings,
       ...update,
       updated_at: new Date().toISOString(),
     };
     this.saveToStorage();
+    this.notify();
+
+    const client = createClient();
+    if (client) {
+      await client
+        .from("site_settings")
+        .upsert({
+          id: this.siteSettings.id || "f1000000-0000-0000-0000-000000000001",
+          business_name: this.siteSettings.business_name,
+          logo_url: this.siteSettings.logo_url,
+          business_email: this.siteSettings.business_email,
+          business_phone: this.siteSettings.business_phone,
+          whatsapp_number: this.siteSettings.whatsapp_number,
+          address: this.siteSettings.address,
+          about_content: this.siteSettings.about_content,
+          delivery_information: this.siteSettings.delivery_information,
+          return_policy: this.siteSettings.return_policy,
+          social_links: this.siteSettings.social_links,
+          primary_colour: this.siteSettings.primary_colour,
+          updated_at: new Date().toISOString(),
+        })
+        .catch((err: any) => console.warn("[SITE_SETTINGS] Supabase upsert error:", err));
+    }
   }
 }
 

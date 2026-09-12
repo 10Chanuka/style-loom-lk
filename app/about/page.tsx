@@ -22,7 +22,18 @@ export default function AboutPage() {
 
   useEffect(() => {
     setSettings(store.getSiteSettings());
+    const unsub = store.subscribe(() => {
+      setSettings(store.getSiteSettings());
+    });
+    store.syncWithSupabase().then(() => {
+      setSettings(store.getSiteSettings());
+    });
+    return () => unsub();
   }, []);
+
+  const aboutParagraphs = (settings.about_content || "")
+    .split(/(?<=\.)\s+/)
+    .filter((p) => p.trim().length > 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
@@ -36,25 +47,22 @@ export default function AboutPage() {
           Wear Your Style. Make It Yours.
         </h1>
         <p className="text-base font-medium text-[#B8860B] leading-relaxed">
-          At Style Loom, we believe clothing is more than something you wear — it is a way to express who you are.
+          {aboutParagraphs[0] || "At Style Loom, we believe clothing is more than something you wear — it is a way to express who you are."}
         </p>
       </div>
 
       {/* Story & Vision */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <div className="space-y-4 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-          <p>
-            We are a Sri Lankan fashion brand bringing together modern style, comfort, and individuality through thoughtfully designed T-shirts and Kurtas. Our collection is created for people who appreciate effortless fashion while still wanting their clothing to feel unique and personal.
-          </p>
-          <p>
-            From everyday favourites to statement pieces, we focus on offering designs that are comfortable, stylish, and made to fit into your lifestyle.
-          </p>
-          <p>
-            At Style Loom, we are committed to continuously bringing you fresh designs and quality products while making your shopping experience simple and enjoyable.
-          </p>
-          <p className="font-bold text-[#B8860B] text-base pt-1">
-            Style Loom, your style, your way.
-          </p>
+          {aboutParagraphs.length > 1 ? (
+            aboutParagraphs.slice(1).map((para, idx) => (
+              <p key={idx} className={idx === aboutParagraphs.length - 2 ? "font-bold text-[#B8860B] text-base pt-1" : ""}>
+                {para}
+              </p>
+            ))
+          ) : (
+            <p>{settings.about_content}</p>
+          )}
           <div className="space-y-2 pt-3 text-xs font-semibold text-slate-800 dark:text-slate-200">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-[#D4AF37]" /> 100% Combed Cotton & Premium Fabric Blends

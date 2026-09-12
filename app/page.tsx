@@ -35,11 +35,14 @@ export default function HomePage() {
 
     // Instant 0ms load from memory
     updateLocalState();
+    const unsub = store.subscribe(updateLocalState);
 
     // Non-blocking background sync
     store.syncWithSupabase().then(() => {
       updateLocalState();
     });
+
+    return () => unsub();
   }, []);
 
   const explicitFeatured = products.filter((p) => p.featured && p.is_active);
