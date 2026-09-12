@@ -288,29 +288,37 @@ class AppStore {
   // Categories
   getCategories(): Category[] {
     return this.categories.map((cat) => {
-      const initMatch = INITIAL_CATEGORIES.find((ic) => ic.id === cat.id || ic.slug === cat.slug);
+      const initMatch = INITIAL_CATEGORIES.find(
+        (ic) =>
+          ic.id === cat.id ||
+          ic.slug === cat.slug ||
+          (ic.id === "22222222-0000-0000-0000-000000000002" && cat.slug === "kurtas") ||
+          (ic.id === "33333333-0000-0000-0000-000000000003" && cat.slug === "blouses")
+      );
       if (initMatch) {
-        cat.image_url = initMatch.image_url;
+        return {
+          ...cat,
+          name: initMatch.name,
+          slug: initMatch.slug,
+          image_url: initMatch.image_url,
+          description: initMatch.description,
+        };
       }
       return cat;
     });
   }
 
   getCategoryBySlug(slug: string): Category | undefined {
-    if (slug === "kurtas") {
-      return {
-        id: "kurtas-parent-id",
-        name: "Kurtas",
-        slug: "kurtas",
-        description: "Explore our signature handcrafted Kurtas, available in both elegant Long Kurtas and modern Short Kurtas.",
-        image_url: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80",
-        is_active: true,
-        display_order: 2,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+    if (!slug) return undefined;
+    const lower = slug.toLowerCase().trim();
+    const cats = this.getCategories();
+    if (lower === "kurtas" || lower === "long-kurtas") {
+      return cats.find((c) => c.slug === "long-kurtas" || c.id === "22222222-0000-0000-0000-000000000002") || cats[1];
     }
-    return this.categories.find((c) => c.slug === slug);
+    if (lower === "blouses" || lower === "short-kurtas") {
+      return cats.find((c) => c.slug === "short-kurtas" || c.id === "33333333-0000-0000-0000-000000000003") || cats[2];
+    }
+    return cats.find((c) => c.slug === lower);
   }
 
   updateCategory(id: string, update: Partial<Category>) {

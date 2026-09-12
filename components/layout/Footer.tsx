@@ -21,6 +21,8 @@ export function Footer() {
     return () => unsub();
   }, []);
 
+  const cleanWhatsapp = (settings.whatsapp_number || "94741880953").replace(/[^0-9]/g, "");
+
   return (
     <footer className="bg-[#1E110A] text-amber-100/90 border-t border-[#3D2314]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
@@ -77,7 +79,7 @@ export function Footer() {
                 </a>
               )}
               <a
-                href={`https://wa.me/${settings.whatsapp_number}`}
+                href={`https://wa.me/${cleanWhatsapp}`}
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 bg-emerald-950 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded-full transition-colors flex items-center gap-1.5 text-xs font-semibold px-3 border border-emerald-800"
