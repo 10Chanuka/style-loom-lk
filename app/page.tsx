@@ -119,7 +119,7 @@ export default function HomePage() {
             No featured products available yet. Add your new products from the Administrator Portal!
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-5">
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -148,7 +148,7 @@ export default function HomePage() {
             New collection drops arriving soon! Add products via Admin Panel.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-5">
             {newArrivals.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

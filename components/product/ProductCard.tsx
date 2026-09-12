@@ -120,29 +120,29 @@ export function ProductCard({ product }: { product: Product }) {
         </Link>
 
         {/* Details */}
-        <div className="p-4 flex flex-col flex-1">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+        <div className="p-3 sm:p-3.5 flex flex-col flex-1">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 mb-0.5">
             <span className="font-bold uppercase tracking-wider text-[#B8860B]">
               {product.product_code}
             </span>
             <span>{product.material ? product.material.split(" ")[0] : "Premium"}</span>
           </div>
 
-          <Link href={`/products/${product.slug}`} className="font-bold text-slate-900 dark:text-white line-clamp-1 hover:text-[#B8860B] transition-colors text-base">
+          <Link href={`/products/${product.slug}`} className="font-bold text-slate-900 dark:text-white line-clamp-1 hover:text-[#B8860B] transition-colors text-sm sm:text-base">
             {product.name}
           </Link>
 
-          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 mb-3 flex-1">
+          <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5 mb-2 flex-1 leading-relaxed">
             {product.short_description}
           </p>
 
           {/* Pricing */}
-          <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-lg font-extrabold text-slate-900 dark:text-white">
+          <div className="flex items-baseline gap-1.5 mb-2.5">
+            <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
               {formatLKR(currentPrice)}
             </span>
             {isOnSale && (
-              <span className="text-xs text-slate-400 line-through">
+              <span className="text-[11px] text-slate-400 line-through">
                 {formatLKR(product.base_price)}
               </span>
             )}
@@ -150,8 +150,8 @@ export function ProductCard({ product }: { product: Product }) {
 
           {/* Interactive Colour Swatches */}
           {availableColours.length > 0 && (
-            <div className="flex items-center gap-1.5 mb-4 flex-wrap">
-              <span className="text-[11px] text-slate-400 font-medium">Colours:</span>
+            <div className="flex items-center gap-1 mb-3 flex-wrap">
+              <span className="text-[10px] text-slate-400 font-medium">Colours:</span>
               {availableColours.map((col, idx) => {
                 const isSelected = selectedColour === col;
                 return (
@@ -163,7 +163,7 @@ export function ProductCard({ product }: { product: Product }) {
                       setSelectedColour(col);
                     }}
                     onMouseEnter={() => setSelectedColour(col)}
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all border ${
+                    className={`px-1.5 py-0.5 rounded text-[9px] font-bold transition-all border ${
                       isSelected
                         ? "bg-[#B8860B] text-white border-[#B8860B] shadow-sm scale-105"
                         : "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
@@ -177,23 +177,23 @@ export function ProductCard({ product }: { product: Product }) {
           )}
 
           {/* Buttons */}
-          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
             <Button
               variant="outline"
               size="sm"
               onClick={handleAddToCart}
-              className="w-full text-xs font-semibold hover:border-[#B8860B]"
+              className="w-full text-[11px] sm:text-xs font-semibold hover:border-[#B8860B] h-8 sm:h-9 px-1.5"
               disabled={product.stock_status === "out_of_stock"}
             >
-              <ShoppingBag className="h-3.5 w-3.5 mr-1 text-[#B8860B]" /> Add Cart
+              <ShoppingBag className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 text-[#B8860B]" /> Add Cart
             </Button>
             <Button
               size="sm"
               onClick={handleWhatsAppDirect}
-              className="w-full text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white"
+              className="w-full text-[11px] sm:text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white h-8 sm:h-9 px-1.5"
               disabled={product.stock_status === "out_of_stock"}
             >
-              <MessageCircle className="h-3.5 w-3.5 mr-1" /> Order WA
+              <MessageCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" /> Order WA
             </Button>
           </div>
         </div>
