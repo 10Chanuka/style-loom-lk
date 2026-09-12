@@ -84,7 +84,7 @@ test.describe("Clothing E-Commerce Complete User Flow Tests", () => {
 
   test("8. Administrator login and dashboard access", async ({ page }) => {
     await page.goto("http://localhost:3000/admin/login");
-    await page.fill('input[placeholder="admin@elegancefashion.lk"]', "admin@elegancefashion.lk");
+    await page.fill('input[placeholder="Styleloom2050@gmail.com"]', "Styleloom2050@gmail.com");
     await page.fill('input[placeholder="••••••••"]', "adminpass");
     await page.click('button:has-text("Login to Admin Portal")');
 
@@ -99,6 +99,6 @@ test.describe("Clothing E-Commerce Complete User Flow Tests", () => {
   test("10. Mobile navigation works correctly", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("http://localhost:3000/");
-    await expect(page.locator("text=Elegance")).toBeVisible();
+    await expect(page.locator("text=Style Loom")).toBeVisible();
   });
 });

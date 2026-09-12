@@ -83,7 +83,7 @@ export default function FeedbackPage() {
       
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-1.5 bg-rose-100 text-brand px-3 py-1 rounded-full text-xs font-bold dark:bg-slate-800">
+        <div className="inline-flex items-center gap-1.5 bg-[#FAF7EF] text-[#B8860B] border border-[#D4AF37]/30 px-3 py-1 rounded-full text-xs font-bold dark:bg-slate-800">
           <MessageSquare className="h-4 w-4" /> Customer Feedback
         </div>
         <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">

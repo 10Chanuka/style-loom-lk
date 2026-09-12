@@ -298,10 +298,10 @@ VALUES (
   '+94 74 188 0953',
   '94741880953',
   'No 432/1B, Sri Vijaya Road, Palanwaththa, Pannipitiya.',
-  'Style That Speaks, Quality That Lasts. Welcome to Style Loom, your premier destination for high-quality printed T-shirts, handcrafted women Kurtas, and exquisitely tailored saree and modern Blouses in Sri Lanka.',
+  'At Style Loom, we believe clothing is more than something you wear — it is a way to express who you are. We are a Sri Lankan fashion brand bringing together modern style, comfort, and individuality through thoughtfully designed T-shirts and Kurtas. Our collection is created for people who appreciate effortless fashion while still wanting their clothing to feel unique and personal. From everyday favourites to statement pieces, we focus on offering designs that are comfortable, stylish, and made to fit into your lifestyle. At Style Loom, we are committed to continuously bringing you fresh designs and quality products while making your shopping experience simple and enjoyable. Style Loom, your style, your way.',
   'We offer fast island-wide delivery across Sri Lanka within 3 to 5 business days. A flat shipping rate of LKR 350 applies to all standard orders. Express Colombo delivery is available upon request.',
   'We offer a 7-day hassle-free size exchange policy. If your item does not fit perfectly, contact our team via WhatsApp to arrange a replacement. Items must be unworn with original tags attached.',
   '{"facebook": "https://www.facebook.com/share/1EbZ7FjzoQ/", "instagram": "https://www.instagram.com/style__loom__", "tiktok": "https://www.tiktok.com/@styleloom2050"}'::jsonb,
-  '#e11d48'
+  '#D4AF37'
 )
 ON CONFLICT (id) DO NOTHING;

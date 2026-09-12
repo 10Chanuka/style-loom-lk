@@ -182,11 +182,11 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
   business_phone TEXT NOT NULL DEFAULT '+94 74 188 0953',
   whatsapp_number TEXT NOT NULL DEFAULT '94741880953',
   address TEXT NOT NULL DEFAULT 'No 432/1B, Sri Vijaya Road, Palanwaththa, Pannipitiya.',
-  about_content TEXT NOT NULL DEFAULT 'At Elegance Fashion, we craft premium printed T-shirts, elegant women Kurtas, and beautifully structured Blouses tailored with love and precision.',
+  about_content TEXT NOT NULL DEFAULT 'At Style Loom, we believe clothing is more than something you wear — it is a way to express who you are. We are a Sri Lankan fashion brand bringing together modern style, comfort, and individuality through thoughtfully designed T-shirts and Kurtas. Our collection is created for people who appreciate effortless fashion while still wanting their clothing to feel unique and personal. From everyday favourites to statement pieces, we focus on offering designs that are comfortable, stylish, and made to fit into your lifestyle. At Style Loom, we are committed to continuously bringing you fresh designs and quality products while making your shopping experience simple and enjoyable. Style Loom, your style, your way.',
   delivery_information TEXT NOT NULL DEFAULT 'Island-wide delivery within 3-5 working days. Flat rate shipping fee LKR 350 across Sri Lanka.',
   return_policy TEXT NOT NULL DEFAULT '7-day easy exchange policy for size exchanges or manufacturing defects. Returned items must be unworn and in original condition.',
   social_links JSONB DEFAULT '{"facebook": "https://www.facebook.com/share/1EbZ7FjzoQ/", "instagram": "https://www.instagram.com/style__loom__", "tiktok": "https://www.tiktok.com/@styleloom2050"}'::jsonb,
-  primary_colour TEXT NOT NULL DEFAULT '#E11D48',
+  primary_colour TEXT NOT NULL DEFAULT '#D4AF37',
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

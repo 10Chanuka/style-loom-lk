@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     }
 
     const resendApiKey = process.env.RESEND_API_KEY;
-    const targetEmail = process.env.FEEDBACK_EMAIL || "info@elegancefashion.lk";
+    const targetEmail = process.env.FEEDBACK_EMAIL || "Styleloom2050@gmail.com";
 
     // If Resend API key is configured, send email notification
     if (resendApiKey && !resendApiKey.includes("placeholder")) {
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "Elegance Fashion <onboarding@resend.dev>",
+            from: "Style Loom <onboarding@resend.dev>",
             to: [targetEmail],
             subject: `[Customer Feedback] ${subject}`,
             html: `

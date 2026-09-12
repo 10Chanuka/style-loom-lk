@@ -23,7 +23,7 @@ class AppStore {
     {
       id: "admin-user-id-001",
       full_name: "Store Administrator",
-      email: "admin@elegancefashion.lk",
+      email: "Styleloom2050@gmail.com",
       role: "admin",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
