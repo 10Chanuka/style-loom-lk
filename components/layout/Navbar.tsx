@@ -164,14 +164,6 @@ export function Navbar() {
                 </Button>
               )}
 
-              {/* Administrator Login (Desktop Right Corner) */}
-              <Link
-                href="/admin/login"
-                className="hidden lg:flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 border border-slate-200 px-2.5 py-1 rounded-md dark:border-slate-800 dark:text-slate-400"
-              >
-                <ShieldCheck className="h-3.5 w-3.5 text-slate-400" /> Admin
-              </Link>
-
               {/* Mobile menu trigger */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -258,15 +250,6 @@ export function Navbar() {
                     </Button>
                   </div>
                 )}
-
-                {/* Administrator Login (Mobile Menu Location) */}
-                <Link
-                  href="/admin/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2.5 text-xs text-slate-500 font-medium border border-slate-200 rounded-lg dark:border-slate-800"
-                >
-                  <ShieldCheck className="h-4 w-4 text-slate-400" /> Administrator Login
-                </Link>
               </div>
             </nav>
           </div>
