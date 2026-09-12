@@ -73,18 +73,18 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm dark:bg-slate-900/95 dark:border-slate-800">
+      <header className="sticky top-0 z-40 bg-[#2A170C]/95 backdrop-blur-md border-b border-[#3D2314] shadow-lg text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
             
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 font-bold tracking-tight text-slate-900 dark:text-white">
-              <img src="/logo.jpg" alt="Style Loom Logo" className="h-10 w-10 rounded-lg object-cover shadow-sm border border-slate-200 dark:border-slate-800" />
+            {/* Logo: Style (White) Loom (Gold) */}
+            <Link href="/" className="flex items-center gap-2.5 font-bold tracking-tight">
+              <img src="/logo.jpg" alt="Style Loom Logo" className="h-10 w-10 rounded-lg object-cover shadow-sm border border-[#D4AF37]/40" />
               <div className="flex flex-col">
-                <span className="font-extrabold text-slate-900 dark:text-white leading-none text-lg">
-                  Style <span className="text-brand">Loom</span>
+                <span className="font-extrabold text-xl tracking-tight leading-none">
+                  <span className="text-white">Style</span> <span className="text-[#D4AF37]">Loom</span>
                 </span>
-                <span className="text-[9px] text-slate-500 font-medium tracking-tight mt-0.5 hidden sm:inline">
+                <span className="text-[9px] text-[#D4AF37]/80 font-medium tracking-tight mt-0.5 hidden sm:inline">
                   Style That Speaks, Quality That Lasts
                 </span>
               </div>
@@ -97,34 +97,34 @@ export function Navbar() {
                 placeholder="Search T-shirts, Long Kurtas, Short Kurtas..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-1.5 text-sm rounded-full border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand dark:bg-slate-800 dark:border-slate-700"
+                className="w-full pl-9 pr-4 py-1.5 text-sm rounded-full border border-[#5C3A21] bg-[#1E110A] text-white placeholder-amber-200/50 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
               />
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#D4AF37]" />
             </form>
 
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center space-x-6 text-sm font-medium">
               <Link
                 href="/"
-                className={isCurrent("/") ? "text-brand font-semibold" : "text-slate-700 hover:text-brand dark:text-slate-200"}
+                className={isCurrent("/") ? "text-[#D4AF37] font-bold border-b-2 border-[#D4AF37] pb-1" : "text-amber-100/90 hover:text-[#D4AF37] transition-colors"}
               >
                 Home
               </Link>
               <Link
                 href="/products"
-                className={pathname.startsWith("/products") ? "text-brand font-semibold" : "text-slate-700 hover:text-brand dark:text-slate-200"}
+                className={pathname.startsWith("/products") ? "text-[#D4AF37] font-bold border-b-2 border-[#D4AF37] pb-1" : "text-amber-100/90 hover:text-[#D4AF37] transition-colors"}
               >
                 Shop All
               </Link>
               <Link
                 href="/about"
-                className={isCurrent("/about") ? "text-brand font-semibold" : "text-slate-700 hover:text-brand dark:text-slate-200"}
+                className={isCurrent("/about") ? "text-[#D4AF37] font-bold border-b-2 border-[#D4AF37] pb-1" : "text-amber-100/90 hover:text-[#D4AF37] transition-colors"}
               >
                 About Us
               </Link>
               <Link
                 href="/feedback"
-                className={isCurrent("/feedback") ? "text-brand font-semibold" : "text-slate-700 hover:text-brand dark:text-slate-200"}
+                className={isCurrent("/feedback") ? "text-[#D4AF37] font-bold border-b-2 border-[#D4AF37] pb-1" : "text-amber-100/90 hover:text-[#D4AF37] transition-colors"}
               >
                 Feedback
               </Link>

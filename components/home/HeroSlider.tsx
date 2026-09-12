@@ -153,8 +153,8 @@ export function HeroSlider() {
                 <div className="hidden sm:block absolute bottom-3 sm:bottom-4 inset-x-3 sm:inset-x-6 p-4 sm:p-6 bg-slate-950/85 backdrop-blur-md border border-white/10 rounded-2xl sm:rounded-3xl space-y-2 sm:space-y-3 text-center sm:text-left z-20 shadow-2xl">
                   
                   {/* Tagline Badge */}
-                  <div className="inline-flex items-center gap-1.5 bg-amber-400 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
-                    <Sparkles className="h-3 w-3 text-slate-950" />
+                  <div className="inline-flex items-center gap-1.5 bg-[#D4AF37] text-[#1E110A] text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
+                    <Sparkles className="h-3 w-3 text-[#1E110A]" />
                     <span>{slide.tagline}</span>
                   </div>
 
@@ -170,14 +170,14 @@ export function HeroSlider() {
 
                   {/* Action Buttons with High-Contrast Colors */}
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-3 pt-1">
-                    <Button asChild size="sm" className="bg-rose-600 hover:bg-rose-700 text-white font-extrabold shadow-xl text-xs px-4 py-2 rounded-xl">
+                    <Button asChild size="sm" className="bg-[#B8860B] hover:bg-[#966B08] text-white font-extrabold shadow-xl text-xs px-4 py-2 rounded-xl">
                       <Link href={slide.primaryButtonLink}>
                         {slide.primaryButtonText} <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                       </Link>
                     </Button>
 
                     {slide.secondaryButtonText && (
-                      <Button asChild variant="outline" size="sm" className="bg-white hover:bg-slate-100 text-slate-950 font-extrabold shadow-xl border-white text-xs px-4 py-2 rounded-xl">
+                      <Button asChild variant="outline" size="sm" className="bg-[#3D2314] hover:bg-[#25140A] text-white font-extrabold shadow-xl border-[#5C3A21] text-xs px-4 py-2 rounded-xl">
                         <Link href={slide.secondaryButtonLink || "/products"}>
                           {slide.secondaryButtonText}
                         </Link>

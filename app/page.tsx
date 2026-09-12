@@ -82,14 +82,14 @@ export default function HomePage() {
               </div>
               
               <div className="absolute bottom-0 inset-x-0 p-6 text-white space-y-2">
-                <div className="inline-block bg-brand text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                <div className="inline-block bg-[#B8860B] text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                   Category
                 </div>
                 <h3 className="text-xl font-bold">{cat.name}</h3>
                 <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
                   {cat.description}
                 </p>
-                <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-rose-300 group-hover:text-white transition-colors">
+                <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] group-hover:text-white transition-colors">
                   View Collection <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
@@ -102,7 +102,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand uppercase tracking-wider mb-1">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#B8860B] uppercase tracking-wider mb-1">
               <Sparkles className="h-3.5 w-3.5" /> Handpicked Bestsellers
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">

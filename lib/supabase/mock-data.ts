@@ -235,6 +235,6 @@ export const INITIAL_SITE_SETTINGS: SiteSettings = {
     instagram: "https://www.instagram.com/style__loom__",
     tiktok: "https://tiktok.com/@styleloom2050",
   },
-  primary_colour: "#e11d48",
+  primary_colour: "#D4AF37",
   updated_at: new Date().toISOString(),
 };

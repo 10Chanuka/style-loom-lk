@@ -80,12 +80,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen flex bg-slate-100 dark:bg-slate-950">
       
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 bg-slate-900 text-slate-300 border-r border-slate-800 shrink-0">
-        <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-          <img src="/logo.jpg" alt="Style Loom Logo" className="h-9 w-9 rounded-lg object-cover shadow border border-slate-800" />
+      <aside className="hidden lg:flex flex-col w-64 bg-[#1E110A] text-amber-100/90 border-r border-[#3D2314] shrink-0">
+        <div className="p-6 border-b border-[#3D2314] flex items-center gap-3">
+          <img src="/logo.jpg" alt="Style Loom Logo" className="h-9 w-9 rounded-lg object-cover shadow border border-[#D4AF37]/40" />
           <div>
-            <h2 className="font-extrabold text-white text-base">Style Loom</h2>
-            <span className="text-[10px] text-rose-400 font-bold uppercase tracking-widest">Admin Control</span>
+            <h2 className="font-extrabold text-lg leading-tight">
+              <span className="text-white">Style</span> <span className="text-[#D4AF37]">Loom</span>
+            </h2>
+            <span className="text-[10px] text-[#D4AF37] font-bold uppercase tracking-widest">Admin Control</span>
           </div>
         </div>
 
@@ -99,11 +101,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href={link.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors ${
                   isActive
-                    ? "bg-brand text-white shadow-md"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    ? "bg-[#B8860B] text-white shadow-md font-bold"
+                    : "text-amber-100/80 hover:bg-[#2A170C] hover:text-[#D4AF37]"
                 }`}
               >
-                <Icon className="h-4 w-4 shrink-0" />
+                <Icon className="h-4 w-4 shrink-0 text-[#D4AF37]" />
                 {link.label}
               </Link>
             );

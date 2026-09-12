@@ -77,7 +77,7 @@ export default function CategoryPage() {
             className="absolute inset-0 h-full w-full object-cover opacity-30"
           />
           <div className="relative z-10 space-y-2 max-w-xl">
-            <span className="text-xs font-bold uppercase tracking-wider text-rose-400">Category Collection</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#D4AF37]">Category Collection</span>
             <h1 className="text-3xl sm:text-4xl font-extrabold">{category.name}</h1>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">{category.description}</p>
           </div>
