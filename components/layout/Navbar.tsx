@@ -159,9 +159,23 @@ export function Navbar() {
                   </button>
                 </div>
               ) : (
-                <Button variant="outline" size="sm" onClick={() => openAuth("login")} className="hidden sm:inline-flex">
-                  Login
-                </Button>
+                <div className="hidden sm:flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openAuth("login")}
+                    className="border-[#D4AF37]/50 text-white hover:bg-white/10 hover:text-white text-xs font-semibold"
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => openAuth("signup")}
+                    className="bg-[#D4AF37] hover:bg-[#B8860B] text-slate-950 font-bold text-xs shadow-sm"
+                  >
+                    Sign Up
+                  </Button>
+                </div>
               )}
 
               {/* Mobile menu trigger */}
