@@ -94,7 +94,7 @@ export function HeroSlider() {
       <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#e11d48_1px,transparent_1px)] [background-size:24px_24px]" />
 
       {/* 3D Center Focus Stage Container */}
-      <div className="relative max-w-7xl mx-auto px-4 h-[380px] sm:h-[480px] md:h-[540px] flex items-center justify-center">
+      <div className="relative max-w-7xl mx-auto px-4 h-[260px] sm:h-[480px] md:h-[540px] flex items-center justify-center">
         {SLIDES.map((slide, index) => {
           // Calculate relative index position (-1, 0, 1, etc.)
           let offset = index - currentIndex;
@@ -148,9 +148,9 @@ export function HeroSlider() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
               </div>
 
-              {/* Slide Content Overlay (Visible on Center Slide) */}
+              {/* Slide Content Overlay (Visible on Center Slide for Desktop/Tablet - Hidden on Mobile) */}
               {isCenter && (
-                <div className="absolute bottom-3 sm:bottom-4 inset-x-3 sm:inset-x-6 p-4 sm:p-6 bg-slate-950/85 backdrop-blur-md border border-white/10 rounded-2xl sm:rounded-3xl space-y-2 sm:space-y-3 text-center sm:text-left z-20 shadow-2xl">
+                <div className="hidden sm:block absolute bottom-3 sm:bottom-4 inset-x-3 sm:inset-x-6 p-4 sm:p-6 bg-slate-950/85 backdrop-blur-md border border-white/10 rounded-2xl sm:rounded-3xl space-y-2 sm:space-y-3 text-center sm:text-left z-20 shadow-2xl">
                   
                   {/* Tagline Badge */}
                   <div className="inline-flex items-center gap-1.5 bg-amber-400 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
