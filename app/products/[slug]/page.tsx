@@ -95,8 +95,24 @@ function ProductDetailsContent() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center text-slate-500">
-        <p className="text-sm font-medium animate-pulse">Loading product details...</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 animate-pulse">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          <div className="aspect-square w-full rounded-2xl bg-slate-200 dark:bg-slate-800" />
+          <div className="space-y-6">
+            <div className="h-4 w-24 rounded-full bg-slate-200 dark:bg-slate-800" />
+            <div className="h-8 w-3/4 rounded-lg bg-slate-200 dark:bg-slate-800" />
+            <div className="h-6 w-32 rounded-lg bg-slate-200 dark:bg-slate-800" />
+            <div className="h-16 w-full rounded-xl bg-slate-200 dark:bg-slate-800" />
+            <div className="flex gap-2">
+              <div className="h-10 w-24 rounded-xl bg-slate-200 dark:bg-slate-800" />
+              <div className="h-10 w-24 rounded-xl bg-slate-200 dark:bg-slate-800" />
+            </div>
+            <div className="grid grid-cols-2 gap-3 pt-4">
+              <div className="h-12 w-full rounded-xl bg-slate-200 dark:bg-slate-800" />
+              <div className="h-12 w-full rounded-xl bg-slate-200 dark:bg-slate-800" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

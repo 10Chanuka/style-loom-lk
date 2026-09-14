@@ -61,6 +61,17 @@ class AppStore {
     },
   ];
   private feedbackList: FeedbackItem[] = [];
+  private isSyncing = false;
+  private isLoaded = false;
+  private syncPromise: Promise<void> | null = null;
+
+  isStoreLoaded(): boolean {
+    return this.isLoaded;
+  }
+
+  isStoreSyncing(): boolean {
+    return this.isSyncing;
+  }
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -353,82 +364,93 @@ class AppStore {
 
   async syncWithSupabase() {
     if (typeof window === "undefined") return;
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
+    if (this.syncPromise) return this.syncPromise;
 
-      // 1. Fetch from Server API with generous timeout
-      const res = await fetch("/api/products", { signal: controller.signal }).catch(() => null);
-      clearTimeout(timeoutId);
+    this.isSyncing = true;
+    this.notify();
 
-      if (res && res.ok) {
-        const json = await res.json();
-        if (json.products && Array.isArray(json.products)) {
-          const fetchedProds: Product[] = json.products.map((p: any) => ({
-            ...p,
-            product_images: p.product_images || [],
-            product_variants: p.product_variants || [],
-          }));
+    this.syncPromise = (async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-          if (json.source === "supabase") {
-            // Supabase is online and authoritative. Keep fetched products, but also retain any local items not yet in DB.
-            const serverIds = new Set(fetchedProds.map((p) => p.id));
-            const localOnly = this.products.filter((lp) => !serverIds.has(lp.id));
-            this.products = [...fetchedProds, ...localOnly];
-          } else {
-            // Supabase is offline/fallback. Do NOT overwrite local admin products with mock server defaults!
-            const existingMap = new Map(this.products.map((p) => [p.id, p]));
-            fetchedProds.forEach((fp) => {
-              if (!existingMap.has(fp.id)) {
-                existingMap.set(fp.id, fp);
-              }
-            });
-            this.products = Array.from(existingMap.values());
+        // 1. Fetch from Server API with generous timeout
+        const res = await fetch("/api/products", { signal: controller.signal }).catch(() => null);
+        clearTimeout(timeoutId);
+
+        if (res && res.ok) {
+          const json = await res.json();
+          if (json.products && Array.isArray(json.products)) {
+            const fetchedProds: Product[] = json.products.map((p: any) => ({
+              ...p,
+              product_images: p.product_images || [],
+              product_variants: p.product_variants || [],
+            }));
+
+            if (json.source === "supabase") {
+              // Supabase is online and authoritative. Keep fetched products, but also retain any local items not yet in DB.
+              const serverIds = new Set(fetchedProds.map((p) => p.id));
+              const localOnly = this.products.filter((lp) => !serverIds.has(lp.id));
+              this.products = [...fetchedProds, ...localOnly];
+            } else {
+              // Supabase is offline/fallback. Do NOT overwrite local admin products with mock server defaults!
+              const existingMap = new Map(this.products.map((p) => [p.id, p]));
+              fetchedProds.forEach((fp) => {
+                if (!existingMap.has(fp.id)) {
+                  existingMap.set(fp.id, fp);
+                }
+              });
+              this.products = Array.from(existingMap.values());
+            }
+
+            this.saveToStorage();
+          }
+        }
+
+        // 2. Direct client fallback check
+        const client = createClient();
+        if (client) {
+          const { data: catData } = await client
+            .from("categories")
+            .select("*")
+            .order("display_order", { ascending: true })
+            .abortSignal(AbortSignal.timeout(6000))
+            .catch(() => ({ data: null }));
+
+          if (catData && catData.length > 0) {
+            this.categories = catData;
+          }
+
+          const { data: setData } = await client
+            .from("site_settings")
+            .select("*")
+            .limit(1)
+            .maybeSingle()
+            .abortSignal(AbortSignal.timeout(6000))
+            .catch(() => ({ data: null }));
+
+          if (setData) {
+            this.siteSettings = {
+              ...this.siteSettings,
+              ...setData,
+              social_links: typeof setData.social_links === "string"
+                ? JSON.parse(setData.social_links)
+                : setData.social_links || this.siteSettings.social_links,
+            };
           }
 
           this.saveToStorage();
-          this.notify();
         }
-      }
-
-      // 2. Direct client fallback check
-      const client = createClient();
-      if (client) {
-        const { data: catData } = await client
-          .from("categories")
-          .select("*")
-          .order("display_order", { ascending: true })
-          .abortSignal(AbortSignal.timeout(6000))
-          .catch(() => ({ data: null }));
-
-        if (catData && catData.length > 0) {
-          this.categories = catData;
-        }
-
-        const { data: setData } = await client
-          .from("site_settings")
-          .select("*")
-          .limit(1)
-          .maybeSingle()
-          .abortSignal(AbortSignal.timeout(6000))
-          .catch(() => ({ data: null }));
-
-        if (setData) {
-          this.siteSettings = {
-            ...this.siteSettings,
-            ...setData,
-            social_links: typeof setData.social_links === "string"
-              ? JSON.parse(setData.social_links)
-              : setData.social_links || this.siteSettings.social_links,
-          };
-        }
-
-        this.saveToStorage();
+      } catch (err) {
+        console.warn("[SUPABASE] Sync warning:", err);
+      } finally {
+        this.isSyncing = false;
+        this.isLoaded = true;
         this.notify();
       }
-    } catch (err) {
-      console.warn("[SUPABASE] Sync warning:", err);
-    }
+    })();
+
+    return this.syncPromise;
   }
 
   saveProduct(productData: Partial<Product>) {

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { store } from "@/lib/supabase/store";
 import { ProductCard } from "@/components/product/ProductCard";
+import { ProductSkeletonGrid } from "@/components/product/ProductCardSkeleton";
 import { ArrowLeft, Sparkles, Layers } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -17,12 +18,14 @@ export default function CategoryPage() {
     slug === "long-kurtas" ? "long" : slug === "short-kurtas" ? "short" : "all"
   );
   const [allProducts, setAllProducts] = useState(store.getProducts());
+  const [loading, setLoading] = useState(!store.isStoreLoaded());
 
   useEffect(() => {
     const updateLocalState = () => {
       const cat = store.getCategoryBySlug(slug);
       setCategory(cat);
       setAllProducts(store.getProducts());
+      if (store.isStoreLoaded()) setLoading(false);
     };
 
     updateLocalState();
@@ -30,10 +33,15 @@ export default function CategoryPage() {
     else if (slug === "short-kurtas") setActiveKurtaTab("short");
     else if (slug === "kurtas") setActiveKurtaTab("all");
 
+    const unsub = store.subscribe(updateLocalState);
+
     // Non-blocking background sync from cloud database
     store.syncWithSupabase().then(() => {
       updateLocalState();
+      setLoading(false);
     });
+
+    return () => unsub();
   }, [slug]);
 
   if (!category) {
@@ -129,7 +137,9 @@ export default function CategoryPage() {
           Available {isKurtaCategory && activeKurtaTab === "long" ? "Long Kurtas" : isKurtaCategory && activeKurtaTab === "short" ? "Short Kurtas" : category.name} ({displayedProducts.length})
         </h2>
 
-        {displayedProducts.length === 0 ? (
+        {loading ? (
+          <ProductSkeletonGrid count={5} />
+        ) : displayedProducts.length === 0 ? (
           <div className="p-12 text-center text-slate-500 bg-white rounded-xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
             No products available in this section yet. Check back soon!
           </div>

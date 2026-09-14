@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { store } from "@/lib/supabase/store";
 import { ProductFilters, FilterState } from "@/components/product/ProductFilters";
 import { ProductCard } from "@/components/product/ProductCard";
+import { ProductSkeletonGrid } from "@/components/product/ProductCardSkeleton";
 import { ShoppingBag, SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +17,7 @@ function ProductsContent() {
 
   const [categories, setCategories] = useState(store.getCategories());
   const [products, setProducts] = useState(store.getProducts());
+  const [loading, setLoading] = useState(!store.isStoreLoaded());
 
   const [filters, setFilters] = useState<FilterState>({
     search: initialQuery,
@@ -33,13 +35,18 @@ function ProductsContent() {
     const updateState = () => {
       setCategories(store.getCategories());
       setProducts(store.getProducts());
+      if (store.isStoreLoaded()) setLoading(false);
     };
-    // Instant local load
+
     updateState();
-    // Non-blocking background sync
+    const unsub = store.subscribe(updateState);
+
     store.syncWithSupabase().then(() => {
       updateState();
+      setLoading(false);
     });
+
+    return () => unsub();
   }, []);
 
   const handleFilterChange = (newFilters: Partial<FilterState>) => {
@@ -135,7 +142,9 @@ function ProductsContent() {
       </div>
 
       {/* Grid */}
-      {filteredProducts.length === 0 ? (
+      {loading ? (
+        <ProductSkeletonGrid count={8} />
+      ) : filteredProducts.length === 0 ? (
         <div className="py-16 text-center space-y-4 rounded-2xl bg-white border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
           <SearchX className="h-12 w-12 text-slate-400 mx-auto" />
           <div className="space-y-1">
@@ -163,7 +172,7 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="p-12 text-center text-sm text-slate-500">Loading products catalog...</div>}>
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-10"><ProductSkeletonGrid count={8} /></div>}>
       <ProductsContent />
     </Suspense>
   );

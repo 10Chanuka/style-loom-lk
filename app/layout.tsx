@@ -5,6 +5,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { SiteLoader } from "@/components/layout/SiteLoader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,6 +37,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className={inter.className}>
         <ToastProvider>
+          <SiteLoader />
           <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
             <AnnouncementBar />
             <Navbar />

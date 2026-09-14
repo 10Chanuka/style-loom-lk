@@ -5,6 +5,7 @@ import Link from "next/link";
 import { store } from "@/lib/supabase/store";
 import { INITIAL_CATEGORIES, INITIAL_PRODUCTS, INITIAL_SITE_SETTINGS, Category, Product, ProductReview, SiteSettings } from "@/lib/supabase/mock-data";
 import { ProductCard } from "@/components/product/ProductCard";
+import { ProductSkeletonGrid } from "@/components/product/ProductCardSkeleton";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles,
@@ -24,6 +25,7 @@ export default function HomePage() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SITE_SETTINGS);
+  const [loading, setLoading] = useState(!store.isStoreLoaded());
 
   useEffect(() => {
     const updateLocalState = () => {
@@ -31,6 +33,7 @@ export default function HomePage() {
       setProducts(store.getProducts());
       setReviews(store.getAllReviews().filter((r) => r.status === "approved"));
       setSettings(store.getSiteSettings());
+      if (store.isStoreLoaded()) setLoading(false);
     };
 
     // Instant 0ms load from memory
@@ -40,6 +43,7 @@ export default function HomePage() {
     // Non-blocking background sync
     store.syncWithSupabase().then(() => {
       updateLocalState();
+      setLoading(false);
     });
 
     return () => unsub();
@@ -117,7 +121,9 @@ export default function HomePage() {
           </Button>
         </div>
 
-        {featuredProducts.length === 0 ? (
+        {loading ? (
+          <ProductSkeletonGrid count={5} />
+        ) : featuredProducts.length === 0 ? (
           <div className="p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800 text-xs">
             No featured products available yet. Add your new products from the Administrator Portal!
           </div>
@@ -146,7 +152,9 @@ export default function HomePage() {
           </Button>
         </div>
 
-        {newArrivals.length === 0 ? (
+        {loading ? (
+          <ProductSkeletonGrid count={4} />
+        ) : newArrivals.length === 0 ? (
           <div className="p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800 text-xs">
             New collection drops arriving soon! Add products via Admin Panel.
           </div>
