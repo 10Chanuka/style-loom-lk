@@ -477,6 +477,7 @@ class AppStore {
       };
       this.products.unshift(targetProduct);
     }
+    this.deletedProductIds.delete(targetProduct.id);
     this.saveToStorage();
     this.notify();
 
