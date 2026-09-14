@@ -108,9 +108,9 @@ class AppStore {
       const v = localStorage.getItem("elegance_store_v5");
       if (!v) {
         localStorage.setItem("elegance_store_v5", "5.0");
-        localStorage.setItem("elegance_products", JSON.stringify([]));
+        localStorage.setItem("elegance_products", JSON.stringify(INITIAL_PRODUCTS));
         localStorage.setItem("elegance_categories", JSON.stringify(INITIAL_CATEGORIES));
-        this.products = [];
+        this.products = [...INITIAL_PRODUCTS];
         this.categories = [...INITIAL_CATEGORIES];
         this.siteSettings = { ...INITIAL_SITE_SETTINGS };
         return;
@@ -128,9 +128,10 @@ class AppStore {
 
       const p = localStorage.getItem("elegance_products");
       if (p) {
-        this.products = JSON.parse(p);
+        const parsed: Product[] = JSON.parse(p);
+        this.products = parsed.length > 0 ? parsed : [...INITIAL_PRODUCTS];
       } else {
-        this.products = [];
+        this.products = [...INITIAL_PRODUCTS];
       }
       const c = localStorage.getItem("elegance_categories");
       if (c) {
@@ -363,12 +364,30 @@ class AppStore {
       if (res && res.ok) {
         const json = await res.json();
         if (json.products && Array.isArray(json.products)) {
-          this.products = json.products.map((p: any) => ({
+          const fetchedProds: Product[] = json.products.map((p: any) => ({
             ...p,
             product_images: p.product_images || [],
             product_variants: p.product_variants || [],
           }));
+
+          if (json.source === "supabase") {
+            // Supabase is online and authoritative. Keep fetched products, but also retain any local items not yet in DB.
+            const serverIds = new Set(fetchedProds.map((p) => p.id));
+            const localOnly = this.products.filter((lp) => !serverIds.has(lp.id));
+            this.products = [...fetchedProds, ...localOnly];
+          } else {
+            // Supabase is offline/fallback. Do NOT overwrite local admin products with mock server defaults!
+            const existingMap = new Map(this.products.map((p) => [p.id, p]));
+            fetchedProds.forEach((fp) => {
+              if (!existingMap.has(fp.id)) {
+                existingMap.set(fp.id, fp);
+              }
+            });
+            this.products = Array.from(existingMap.values());
+          }
+
           this.saveToStorage();
+          this.notify();
         }
       }
 
@@ -421,6 +440,7 @@ class AppStore {
         targetProduct = this.products[idx];
       } else {
         targetProduct = productData as Product;
+        this.products.unshift(targetProduct);
       }
     } else {
       const newId = generateUUID();
@@ -447,6 +467,7 @@ class AppStore {
       this.products.unshift(targetProduct);
     }
     this.saveToStorage();
+    this.notify();
 
     // Async Cloud Database Sync via Server API (persists across all devices)
     try {
@@ -463,6 +484,7 @@ class AppStore {
   deleteProduct(id: string) {
     this.products = this.products.filter((p) => p.id !== id);
     this.saveToStorage();
+    this.notify();
 
     try {
       fetch(`/api/products?id=${encodeURIComponent(id)}`, {
