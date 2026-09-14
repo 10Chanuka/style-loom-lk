@@ -374,21 +374,12 @@ class AppStore {
               }));
 
             if (json.source === "supabase") {
-              // Supabase is online and authoritative. Keep fetched products, but also retain any local items not yet in DB.
               const serverIds = new Set(fetchedProds.map((p) => p.id));
               const localOnly = this.products.filter((lp) => !serverIds.has(lp.id) && !this.deletedProductIds.has(lp.id));
               this.products = [...fetchedProds, ...localOnly];
             } else {
-              // Supabase is offline/fallback. Do NOT overwrite local admin products with mock server defaults!
-              const existingMap = new Map(
-                this.products.filter((p) => !this.deletedProductIds.has(p.id)).map((p) => [p.id, p])
-              );
-              fetchedProds.forEach((fp) => {
-                if (!existingMap.has(fp.id) && !this.deletedProductIds.has(fp.id)) {
-                  existingMap.set(fp.id, fp);
-                }
-              });
-              this.products = Array.from(existingMap.values());
+              // Adopt server-synced list directly so deletions on other devices propagate everywhere
+              this.products = fetchedProds;
             }
 
             this.products = this.products.filter((p) => !this.deletedProductIds.has(p.id));

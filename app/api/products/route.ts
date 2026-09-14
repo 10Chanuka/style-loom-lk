@@ -5,11 +5,16 @@ import { generateUUID } from "@/lib/utils";
 
 const isValidUUID = (id?: string) => Boolean(id && id.length === 36 && id.includes("-"));
 
+// Global Server-Side Shared Store for universal multi-device sync
+let SERVER_PRODUCTS: any[] = [...INITIAL_PRODUCTS];
+const SERVER_DELETED_IDS: Set<string> = new Set();
+
 export async function GET() {
   try {
     const supabase = createAdminClient();
     if (!supabase) {
-      return NextResponse.json({ products: INITIAL_PRODUCTS, source: "mock" });
+      const filteredMock = SERVER_PRODUCTS.filter((p) => !SERVER_DELETED_IDS.has(p.id));
+      return NextResponse.json({ products: filteredMock, source: "mock" });
     }
 
     const { data: products, error } = await supabase
@@ -18,7 +23,8 @@ export async function GET() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      return NextResponse.json({ products: INITIAL_PRODUCTS, source: "mock" });
+      const filteredMock = SERVER_PRODUCTS.filter((p) => !SERVER_DELETED_IDS.has(p.id));
+      return NextResponse.json({ products: filteredMock, source: "mock" });
     }
 
     if (!products || products.length === 0) {
@@ -31,18 +37,27 @@ export async function GET() {
           .select("*, product_images(*), product_variants(*)")
           .order("created_at", { ascending: false });
 
-        const finalProds = (reFetch || []).map(parseProductImagesColour);
+        const finalProds = (reFetch || [])
+          .filter((p: any) => !SERVER_DELETED_IDS.has(p.id))
+          .map(parseProductImagesColour);
+        SERVER_PRODUCTS = finalProds;
         return NextResponse.json({ products: finalProds, source: "supabase" });
       }
 
       // If categories exist but products table is empty (e.g. products deleted by admin), return [] without re-seeding mock items!
+      SERVER_PRODUCTS = [];
       return NextResponse.json({ products: [], source: "supabase" });
     }
 
-    const formattedProducts = products.map(parseProductImagesColour);
+    const formattedProducts = products
+      .filter((p: any) => !SERVER_DELETED_IDS.has(p.id))
+      .map(parseProductImagesColour);
+
+    SERVER_PRODUCTS = formattedProducts;
     return NextResponse.json({ products: formattedProducts, source: "supabase" });
   } catch (err: any) {
-    return NextResponse.json({ products: INITIAL_PRODUCTS, error: err.message });
+    const filteredMock = SERVER_PRODUCTS.filter((p) => !SERVER_DELETED_IDS.has(p.id));
+    return NextResponse.json({ products: filteredMock, error: err.message });
   }
 }
 
@@ -72,13 +87,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required product fields" }, { status: 400 });
     }
 
-    if (!supabase) {
-      return NextResponse.json({ success: true, product: productData, note: "Local store fallback" });
-    }
-
     const productId = isValidUUID(productData.id) ? productData.id : generateUUID();
     const slug = productData.slug || productData.name.toLowerCase().replace(/\s+/g, "-");
     const code = productData.product_code || `PRD-${Date.now().toString().slice(-4)}`;
+
+    const targetProduct = {
+      ...productData,
+      id: productId,
+      slug,
+      product_code: code,
+      product_images: productData.product_images || [],
+      product_variants: productData.product_variants || [],
+    };
+
+    // Update Server-Side Shared Memory Store immediately
+    SERVER_DELETED_IDS.delete(productId);
+    const existingIdx = SERVER_PRODUCTS.findIndex((p) => p.id === productId);
+    if (existingIdx !== -1) {
+      SERVER_PRODUCTS[existingIdx] = { ...SERVER_PRODUCTS[existingIdx], ...targetProduct };
+    } else {
+      SERVER_PRODUCTS.unshift(targetProduct);
+    }
+
+    if (!supabase) {
+      return NextResponse.json({ success: true, productId, note: "Updated server store" });
+    }
 
     // Ensure category_id is a valid UUID
     let categoryId = isValidUUID(productData.category_id) ? productData.category_id : null;
@@ -163,9 +196,13 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Missing product id" }, { status: 400 });
     }
 
+    // Instantly delete from Server Shared Store for all devices
+    SERVER_DELETED_IDS.add(id);
+    SERVER_PRODUCTS = SERVER_PRODUCTS.filter((p) => p.id !== id);
+
     const supabase = createAdminClient();
     if (supabase) {
-      // Delete child rows first, then product row
+      // Delete child rows first, then product row in Supabase
       await supabase.from("product_images").delete().eq("product_id", id);
       await supabase.from("product_variants").delete().eq("product_id", id);
       await supabase.from("products").delete().eq("id", id);
