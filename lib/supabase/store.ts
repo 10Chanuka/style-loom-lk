@@ -387,6 +387,16 @@ class AppStore {
           }
         }
 
+        // Fetch reviews from Server API for multi-device sync
+        const resReviews = await fetch("/api/reviews").catch(() => null);
+        if (resReviews && resReviews.ok) {
+          const rJson = await resReviews.json();
+          if (rJson.reviews && Array.isArray(rJson.reviews)) {
+            this.reviews = rJson.reviews;
+            this.saveToStorage();
+          }
+        }
+
         // 2. Direct client fallback check
         const client = createClient();
         if (client) {
@@ -639,6 +649,18 @@ class AppStore {
     };
     this.reviews.unshift(newRev);
     this.saveToStorage();
+    this.notify();
+
+    try {
+      fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newRev),
+      }).catch((err) => console.warn("[REVIEWS_POST] Sync error:", err));
+    } catch (err) {
+      console.warn("[REVIEWS_POST] Error:", err);
+    }
+
     return newRev;
   }
 
@@ -648,12 +670,32 @@ class AppStore {
       this.reviews[idx].status = status;
       this.reviews[idx].updated_at = new Date().toISOString();
       this.saveToStorage();
+      this.notify();
+
+      try {
+        fetch("/api/reviews", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, status }),
+        }).catch((err) => console.warn("[REVIEWS_PATCH] Sync error:", err));
+      } catch (err) {
+        console.warn("[REVIEWS_PATCH] Error:", err);
+      }
     }
   }
 
   deleteReview(id: string) {
     this.reviews = this.reviews.filter((r) => r.id !== id);
     this.saveToStorage();
+    this.notify();
+
+    try {
+      fetch(`/api/reviews?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      }).catch((err) => console.warn("[REVIEWS_DELETE] Sync error:", err));
+    } catch (err) {
+      console.warn("[REVIEWS_DELETE] Error:", err);
+    }
   }
 
   // Feedback
