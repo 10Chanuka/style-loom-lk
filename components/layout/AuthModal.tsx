@@ -130,7 +130,11 @@ export function AuthModal({
       }
 
       setEmailSentStatus(sent);
-      showToast(`6-digit OTP code generated and sent to ${email}!`, "info");
+      if (sent) {
+        showToast(`6-digit OTP code sent to your email (${email})!`, "success");
+      } else {
+        showToast(`Verification code generated for ${email}!`, "info");
+      }
       setStep("otp");
       setCountdown(60);
       setCanResend(false);
@@ -396,18 +400,43 @@ export function AuthModal({
         <form onSubmit={handleOtpVerify} className="space-y-4 pt-1">
           {/* Email Sent Notification Card */}
           <div className="bg-slate-50 dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-center space-y-2">
-            <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center mx-auto">
+            <div className={`h-10 w-10 rounded-full flex items-center justify-center mx-auto ${emailSentStatus ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-amber-100 dark:bg-amber-950 text-amber-600'}`}>
               <Mail className="h-5 w-5" />
             </div>
             <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">
-              We have sent a 6-digit verification code to:
+              {emailSentStatus
+                ? "We have sent a 6-digit verification code to:"
+                : "Verification Code Generated for:"}
             </p>
             <p className="text-sm font-extrabold text-brand font-mono">
               {email}
             </p>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              Please check your email inbox (and spam folder) and enter the 6-digit code below to confirm your registration.
-            </p>
+            {emailSentStatus ? (
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Please check your email inbox (and spam folder) and enter the 6-digit code below to confirm your registration.
+              </p>
+            ) : (
+              <div className="mt-2 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700/50 rounded-lg text-left text-xs space-y-1.5">
+                <div className="flex items-center justify-between font-semibold text-amber-800 dark:text-amber-300">
+                  <span>Demo / Instant OTP:</span>
+                  <span className="font-mono text-base font-black tracking-widest text-brand">{generatedOtp}</span>
+                </div>
+                <p className="text-[10px] text-amber-700 dark:text-amber-400 leading-normal">
+                  Note: Add a valid <code>RESEND_API_KEY</code> in your environment variables to deliver emails directly to real customer inboxes.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (generatedOtp && generatedOtp.length === 6) {
+                      setOtpCode(generatedOtp.split(""));
+                    }
+                  }}
+                  className="w-full mt-2 text-center py-1.5 bg-brand hover:bg-brand-700 text-white rounded-lg font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-1"
+                >
+                  ⚡ Auto-fill OTP Code ({generatedOtp})
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-center gap-2 pt-1">
