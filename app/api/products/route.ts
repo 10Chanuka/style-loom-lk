@@ -17,20 +17,26 @@ export async function GET() {
       .select("*, product_images(*), product_variants(*)")
       .order("created_at", { ascending: false });
 
-    if (error || !products || products.length === 0) {
-      // If DB is unpopulated, seed initial categories and products into Supabase
-      await seedSupabaseIfEmpty(supabase);
-      
-      const { data: reFetch } = await supabase
-        .from("products")
-        .select("*, product_images(*), product_variants(*)")
-        .order("created_at", { ascending: false });
+    if (error) {
+      return NextResponse.json({ products: INITIAL_PRODUCTS, source: "mock" });
+    }
 
-      const finalProds = (reFetch && reFetch.length > 0 ? reFetch : INITIAL_PRODUCTS).map(parseProductImagesColour);
-      return NextResponse.json({
-        products: finalProds,
-        source: reFetch && reFetch.length > 0 ? "supabase" : "mock",
-      });
+    if (!products || products.length === 0) {
+      // Check if DB was NEVER seeded by checking categories table
+      const { data: cats } = await supabase.from("categories").select("id").limit(1);
+      if (!cats || cats.length === 0) {
+        await seedSupabaseIfEmpty(supabase);
+        const { data: reFetch } = await supabase
+          .from("products")
+          .select("*, product_images(*), product_variants(*)")
+          .order("created_at", { ascending: false });
+
+        const finalProds = (reFetch || []).map(parseProductImagesColour);
+        return NextResponse.json({ products: finalProds, source: "supabase" });
+      }
+
+      // If categories exist but products table is empty (e.g. products deleted by admin), return [] without re-seeding mock items!
+      return NextResponse.json({ products: [], source: "supabase" });
     }
 
     const formattedProducts = products.map(parseProductImagesColour);
@@ -159,6 +165,9 @@ export async function DELETE(request: Request) {
 
     const supabase = createAdminClient();
     if (supabase) {
+      // Delete child rows first, then product row
+      await supabase.from("product_images").delete().eq("product_id", id);
+      await supabase.from("product_variants").delete().eq("product_id", id);
       await supabase.from("products").delete().eq("id", id);
     }
 

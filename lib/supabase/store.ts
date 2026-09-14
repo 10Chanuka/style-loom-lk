@@ -34,33 +34,9 @@ class AppStore {
   private cart: CartItem[] = [];
   private orders: Order[] = [];
   private customizations: CustomizationRequest[] = [];
-  private reviews: ProductReview[] = [
-    {
-      id: "rev-1",
-      product_id: "a1000000-0000-0000-0000-000000000001",
-      user_id: "user-rev-1",
-      user_name: "Amaya Perera",
-      rating: 5,
-      title: "Super soft cotton & perfect print!",
-      comment: "The palm print T-shirt fits amazingly well and the cotton quality is top-notch for Sri Lanka weather.",
-      status: "approved",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    {
-      id: "rev-2",
-      product_id: "a2000000-0000-0000-0000-000000000001",
-      user_id: "user-rev-2",
-      user_name: "Dilini Fernando",
-      rating: 5,
-      title: "Elegant embroidery & premium fabric",
-      comment: "Bought the emerald green Kurta for an event. Received so many compliments. Highly recommended!",
-      status: "approved",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-  ];
+  private reviews: ProductReview[] = [];
   private feedbackList: FeedbackItem[] = [];
+  private deletedProductIds: Set<string> = new Set();
   private isSyncing = false;
   private isLoaded = false;
   private syncPromise: Promise<void> | null = null;
@@ -93,6 +69,7 @@ class AppStore {
       localStorage.setItem("elegance_customizations", JSON.stringify(this.customizations));
       localStorage.setItem("elegance_reviews", JSON.stringify(this.reviews));
       localStorage.setItem("elegance_feedback", JSON.stringify(this.feedbackList));
+      localStorage.setItem("elegance_deleted_products", JSON.stringify(Array.from(this.deletedProductIds)));
     } catch {
       // storage error fallback
     }
@@ -116,6 +93,13 @@ class AppStore {
   private loadFromStorage() {
     if (typeof window === "undefined") return;
     try {
+      const del = localStorage.getItem("elegance_deleted_products");
+      if (del) {
+        try {
+          this.deletedProductIds = new Set(JSON.parse(del));
+        } catch {}
+      }
+
       const v = localStorage.getItem("elegance_store_v5");
       if (!v) {
         localStorage.setItem("elegance_store_v5", "5.0");
@@ -140,9 +124,9 @@ class AppStore {
       const p = localStorage.getItem("elegance_products");
       if (p) {
         const parsed: Product[] = JSON.parse(p);
-        this.products = parsed.length > 0 ? parsed : [...INITIAL_PRODUCTS];
+        this.products = parsed.filter((item) => !this.deletedProductIds.has(item.id));
       } else {
-        this.products = [...INITIAL_PRODUCTS];
+        this.products = [...INITIAL_PRODUCTS].filter((item) => !this.deletedProductIds.has(item.id));
       }
       const c = localStorage.getItem("elegance_categories");
       if (c) {
@@ -381,28 +365,33 @@ class AppStore {
         if (res && res.ok) {
           const json = await res.json();
           if (json.products && Array.isArray(json.products)) {
-            const fetchedProds: Product[] = json.products.map((p: any) => ({
-              ...p,
-              product_images: p.product_images || [],
-              product_variants: p.product_variants || [],
-            }));
+            const fetchedProds: Product[] = json.products
+              .filter((p: any) => !this.deletedProductIds.has(p.id))
+              .map((p: any) => ({
+                ...p,
+                product_images: p.product_images || [],
+                product_variants: p.product_variants || [],
+              }));
 
             if (json.source === "supabase") {
               // Supabase is online and authoritative. Keep fetched products, but also retain any local items not yet in DB.
               const serverIds = new Set(fetchedProds.map((p) => p.id));
-              const localOnly = this.products.filter((lp) => !serverIds.has(lp.id));
+              const localOnly = this.products.filter((lp) => !serverIds.has(lp.id) && !this.deletedProductIds.has(lp.id));
               this.products = [...fetchedProds, ...localOnly];
             } else {
               // Supabase is offline/fallback. Do NOT overwrite local admin products with mock server defaults!
-              const existingMap = new Map(this.products.map((p) => [p.id, p]));
+              const existingMap = new Map(
+                this.products.filter((p) => !this.deletedProductIds.has(p.id)).map((p) => [p.id, p])
+              );
               fetchedProds.forEach((fp) => {
-                if (!existingMap.has(fp.id)) {
+                if (!existingMap.has(fp.id) && !this.deletedProductIds.has(fp.id)) {
                   existingMap.set(fp.id, fp);
                 }
               });
               this.products = Array.from(existingMap.values());
             }
 
+            this.products = this.products.filter((p) => !this.deletedProductIds.has(p.id));
             this.saveToStorage();
           }
         }
@@ -504,6 +493,7 @@ class AppStore {
   }
 
   deleteProduct(id: string) {
+    this.deletedProductIds.add(id);
     this.products = this.products.filter((p) => p.id !== id);
     this.saveToStorage();
     this.notify();
